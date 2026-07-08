@@ -140,6 +140,25 @@
   footer { text-align:center; font-size:.75rem; color:var(--muted); padding:20px 16px 36px; }
   @media (max-width:520px){ .info{grid-template-columns:1fr;} .info dt{margin-top:6px;} }
 </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css">
+  <style>
+  /* ぬまマップ */
+  .map-title { max-width:1100px; margin:26px auto 0; padding:0 16px; font-size:1.05rem; color:var(--indigo); }
+  .mapwrap { max-width:1100px; margin:10px auto 0; padding:0 16px; }
+  #map { height:440px; border-radius:14px; border:1px solid var(--line); z-index:1; }
+  .maplegend { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .lg-chip { display:inline-flex; align-items:center; gap:5px; border:1px solid var(--line); background:#fff; border-radius:999px; padding:4px 11px; font-size:.78rem; cursor:pointer; transition:.15s; }
+  .lg-chip .dot { width:10px; height:10px; border-radius:50%; }
+  .lg-chip.off { opacity:.35; }
+  .map-note { font-size:.72rem; color:var(--muted, #888); margin-top:6px; }
+  .spot-label { background:rgba(255,255,255,.88); border:none; box-shadow:0 1px 3px rgba(0,0,0,.25); font-size:.68rem; padding:1px 5px; color:#333; border-radius:4px; }
+  .spot-label::before { display:none; }
+  #map.hide-labels .spot-label { display:none; }
+  .map-detail { margin-top:6px; background:var(--indigo); color:#fff; border:none; border-radius:8px; padding:5px 12px; font-size:.78rem; cursor:pointer; }
+  @media (max-width:600px){ #map { height:360px; } }
+  </style>
 </head>
 <body>
 
@@ -160,6 +179,13 @@
 
 <div class="quizbar">
   <button class="quizbtn" id="quizstart">🧠 ぬまクイズに挑戦！ — 南魚沼ご当地クイズ全10問</button>
+</div>
+
+<h2 class="map-title">📍 ぬまマップ — 全スポットを地図で見る</h2>
+<div class="mapwrap">
+  <div class="maplegend" id="maplegend"></div>
+  <div id="map" class="hide-labels"></div>
+  <div class="map-note">凡例タップでジャンルの表示切替 / ズームすると名前が表示されます / ピンをタップ→「詳細を見る」でスポット情報。座標は近似値です。</div>
 </div>
 
 <h2 class="courses-title">🗺 おすすめモデルコース</h2>
@@ -188,6 +214,9 @@
   営業時間・料金は変わることがあります。お出かけ前に公式情報をご確認ください。<br>
   座標は周辺提案・所要時間の目安計算用の近似値です。データはこのHTML内のSPOTS配列を編集して追加・修正できます。
 </footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 
 <script>
 /* ============================================================
@@ -345,7 +374,7 @@ const SPOTS = [
  { id:"keyakien", name:"欅苑", genre:"飲食", area:"六日町",
    desc:"樹齢1,500年の大欅を借景にした茅葺古民家の日本料理店。食べログ「日本料理百名店2025」選出。",
    niche:"山菜・川魚など雪国の食材を使った会席。基本予約制(要確認)。建物と庭を眺めるだけでも価値がある。",
-   address:"南魚沼市(五日町エリア)", lat:37.100, lng:138.920,
+   address:"南魚沼市長森24", lat:37.100, lng:138.920,
    hours:"要予約・要確認", price:"昼5,000円台〜/夜15,000円前後", parking:"あり", season:"新緑・紅葉", tags:["日本料理","百名店","古民家","大欅"] },
 
  { id:"ryuzushi", name:"龍寿し", genre:"飲食", area:"六日町",
@@ -645,7 +674,7 @@ const SPOTS = [
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["麻婆麺","ラーメン","公式サイト掲載"] },
  { id:"gm25", name:"塩沢やぶそば", genre:"飲食", area:"塩沢",
    desc:"風車が目印の老舗蕎麦屋。向かいの田んぼの塩沢産コシヒカリと自家製そばが自慢。", niche:"",
-   address:"南魚沼市(塩沢地域)", lat:37.038, lng:138.851,
+   address:"南魚沼市中167-1", lat:37.038, lng:138.851,
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["そば","老舗","公式サイト掲載"] },
  { id:"gm26", name:"ケロハウス", genre:"カフェ", area:"六日町",
    desc:"隠れ家的カフェ。名物は味の染みた豆腐がどーんと乗る豆腐丼。", niche:"",
@@ -841,7 +870,7 @@ const SPOTS = [
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["八海そば","郷土","公式サイト掲載"] },
  { id:"gm74", name:"YUKIMURO WAGYU UCHIYAMA", genre:"飲食", area:"六日町",
    desc:"雪室で熟成させたにいがた和牛のレストラン&ショップ(魚沼の里)。テラス席も。", niche:"",
-   address:"南魚沼市(六日町地域)", lat:37.065, lng:138.882,
+   address:"南魚沼市長森233-1", lat:37.065, lng:138.882,
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["和牛","雪室","魚沼の里","公式サイト掲載"] },
  { id:"gm75", name:"レストラン きりんこ", genre:"飲食", area:"六日町",
    desc:"五日町駅近く。洋食から中華まで、地元食材のアツアツ・旨辛メニュー。", niche:"",
@@ -941,7 +970,7 @@ const SPOTS = [
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["焼肉","公式サイト掲載"] },
  { id:"gm99", name:"魚沼釜蔵 総本店", genre:"飲食", area:"六日町",
    desc:"魚沼の食文化・風土を体現した逸品。地酒・もち豚・郷土の味が揃う。", niche:"",
-   address:"南魚沼市(六日町地域)", lat:37.065, lng:138.882,
+   address:"南魚沼市六日町105-1", lat:37.065, lng:138.882,
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["居酒屋","郷土","地酒","公式サイト掲載"] },
  { id:"gm100", name:"オーパス", genre:"カフェ", area:"六日町",
    desc:"六日町駅前のレトロ喫茶。地元野菜のオムライスやドリア、カレー。通し営業。", niche:"",
@@ -1141,7 +1170,7 @@ const SPOTS = [
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["丼","田園","公式サイト掲載"] },
  { id:"gm149", name:"上田の郷", genre:"飲食", area:"塩沢",
    desc:"天井の高い店内で自家製コシヒカリ定食と自家製そば。文化体験も。", niche:"",
-   address:"南魚沼市(塩沢地域)", lat:37.038, lng:138.851,
+   address:"南魚沼市長崎2970-1", lat:37.038, lng:138.851,
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["そば","定食","体験","公式サイト掲載"] },
  { id:"gm150", name:"すすり家", genre:"飲食", area:"塩沢",
    desc:"国道17号沿い。ほろほろチャーシューの一杯と燕三条系背脂ラーメン。", niche:"",
@@ -1233,7 +1262,7 @@ const SPOTS = [
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["へぎそば","そば","公式サイト掲載"] },
  { id:"gm172", name:"ちゃわんめし たっぽ家", genre:"飲食", area:"塩沢",
    desc:"道の駅雪あかり内の定食屋。釜炊きの南魚沼産コシヒカリをお手頃に。", niche:"",
-   address:"南魚沼市(塩沢地域)", lat:37.038, lng:138.851,
+   address:"南魚沼市下一日市855", lat:37.038, lng:138.851,
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["定食","道の駅","公式サイト掲載"] },
  { id:"gm173", name:"手づくり西洋料理 欅亭", genre:"飲食", area:"塩沢",
    desc:"石打地区の評判洋食店。ボリューム満点でコスパ抜群。休日は予約推奨。", niche:"",
@@ -1245,11 +1274,11 @@ const SPOTS = [
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["郷土","酒場","公式サイト掲載"] },
  { id:"gm175", name:"魚沼スイーツガーデン NATURA", genre:"カフェ", area:"塩沢",
    desc:"コシヒカリ米粉の「魚沼ばうむ」と魚沼産牛乳の「魚沼ピュアミルク」が看板。", niche:"",
-   address:"南魚沼市(塩沢地域)", lat:37.038, lng:138.851,
+   address:"南魚沼市姥島新田701", lat:37.038, lng:138.851,
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スイーツ","バウムクーヘン","公式サイト掲載"] },
  { id:"gm176", name:"魚野の里", genre:"飲食", area:"塩沢",
    desc:"郷土料理から高級食材メニューまで種類豊富。団体には特別料理も。", niche:"",
-   address:"南魚沼市(塩沢地域)", lat:37.038, lng:138.851,
+   address:"南魚沼市姥島新田699", lat:37.038, lng:138.851,
    hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["郷土料理","公式サイト掲載"] },
  { id:"gm177", name:"石打 邪宗門", genre:"カフェ", area:"塩沢",
    desc:"教会のような外観の老舗喫茶。名店・邪宗門の味を長年伝え続ける。", niche:"",
@@ -1272,13 +1301,13 @@ const SPOTS = [
   { id:"ov7", name:"おこめのケーキ qute", genre:"買物", area:"大和", desc:"週末限定営業、農家が営む小さなお菓子屋。自社栽培の有機JAS認証米の米粉100%シフォンケーキなど。", niche:"", address:"南魚沼市(大和地域)", lat:37.157, lng:138.91, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["米粉スイーツ","グルテンフリー","週末限定","公式サイト掲載"] },
   { id:"ov8", name:"石打丸山 みどりや製菓舗", genre:"買物", area:"塩沢", desc:"石打丸山中央民宿街の老舗菓子店。「特製石打まんじゅう」が大人気。冬期限定ロールケーキは全国菓子大博覧会金賞。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.035, lng:138.855, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["石打まんじゅう","老舗","公式サイト掲載"] },
   { id:"ov9", name:"北欧・クラフトベーカリー 六日町店", genre:"買物", area:"六日町", desc:"ボウリング場に併設されたパン屋。本格プレッツェルやクロワッサン、デニッシュ系が人気。", niche:"", address:"南魚沼市(六日町地域)", lat:37.057, lng:138.876, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["パン","カフェ利用可","公式サイト掲載"] },
-  { id:"ov10", name:"バーゼル", genre:"買物", area:"大和", desc:"浦佐駅からアクセス良好、八色の森公園から散歩がてら訪れられるパン屋。焼きたてがおすすめ。", niche:"", address:"南魚沼市(大和地域)", lat:37.163, lng:138.922, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["パン","公式サイト掲載"] },
+  { id:"ov10", name:"バーゼル", genre:"買物", area:"大和", desc:"浦佐駅からアクセス良好、八色の森公園から散歩がてら訪れられるパン屋。焼きたてがおすすめ。", niche:"", address:"南魚沼市浦佐1630", lat:37.163, lng:138.922, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["パン","公式サイト掲載"] },
   { id:"ov11", name:"ルージュブラン", genre:"買物", area:"六日町", desc:"自慢の食パンのほか、郷土料理「きりざい」を使ったパンやコラボパンも。八海山を眺めるカフェスペースあり。", niche:"", address:"南魚沼市(六日町地域)", lat:37.068, lng:138.877, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["パン","きりざいパン","カフェ併設","公式サイト掲載"] },
   { id:"ov12", name:"ラ・プチ・ボヌール", genre:"買物", area:"塩沢", desc:"本当は教えたくない穴場パン屋。ハード系から総菜パンまで幅広い。開店直後に売り切れることも多い。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.036, lng:138.857, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["パン","穴場","公式サイト掲載"] },
-  { id:"ov13", name:"1095 BAKERY", genre:"買物", area:"六日町", desc:"八海山の仕込み水と天然酵母を使用、全て手作りのパン屋。店名は「365日、朝昼晩、パンがおいしい」から。", niche:"", address:"南魚沼市(六日町地域)", lat:37.058, lng:138.878, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["パン","天然酵母","公式サイト掲載"] },
+  { id:"ov13", name:"1095 BAKERY", genre:"買物", area:"六日町", desc:"八海山の仕込み水と天然酵母を使用、全て手作りのパン屋。店名は「365日、朝昼晩、パンがおいしい」から。", niche:"", address:"南魚沼市長森193-1", lat:37.058, lng:138.878, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["パン","天然酵母","公式サイト掲載"] },
   { id:"ov14", name:"孝泉堂製菓", genre:"買物", area:"六日町", desc:"六日町の歴史ある和菓子店。笹団子や人気の生クリーム笹団子など。地方発送も可。", niche:"", address:"南魚沼市(六日町地域)", lat:37.074, lng:138.889, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["笹団子","和菓子","老舗","公式サイト掲載"] },
   { id:"ov15", name:"MATSUMOTO", genre:"買物", area:"六日町", desc:"和菓子から洋菓子、パンまで豊富な品揃え。銘菓坂戸山、クリーム入大福の雪てまりなどが人気。", niche:"", address:"南魚沼市(六日町地域)", lat:37.069, lng:138.879, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["和菓子","洋菓子","公式サイト掲載"] },
-  { id:"ov16", name:"ユキグニ マルシェ", genre:"買物", area:"六日町", desc:"工場直送の新鮮な雪国きのこ3種が勢ぞろい。地元特産コーナーや地酒、南魚沼産コシヒカリも。", niche:"", address:"南魚沼市(六日町地域)", lat:37.064, lng:138.89, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["きのこ","直売","地酒","公式サイト掲載"] },
+  { id:"ov16", name:"ユキグニ マルシェ", genre:"買物", area:"六日町", desc:"工場直送の新鮮な雪国きのこ3種が勢ぞろい。地元特産コーナーや地酒、南魚沼産コシヒカリも。", niche:"", address:"南魚沼市余川2968-1", lat:37.064, lng:138.89, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["きのこ","直売","地酒","公式サイト掲載"] },
   { id:"ov17", name:"お菓子工房ヴィシー", genre:"買物", area:"六日町", desc:"六日町駅西口から徒歩5分。アップルパイとシフォンケーキが人気。", niche:"", address:"南魚沼市(六日町地域)", lat:37.059, lng:138.88, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["アップルパイ","シフォンケーキ","公式サイト掲載"] },
   { id:"ov18", name:"パティスリー アローイ", genre:"買物", area:"大和", desc:"毎日行列ができる焼き立てマドレーヌとタルトの専門店。焼き上がりは10時頃と13時半頃。", niche:"", address:"南魚沼市(大和地域)", lat:37.165, lng:138.926, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["マドレーヌ","タルト","行列店","公式サイト掲載"] },
   { id:"ov19", name:"コパドーナツ", genre:"買物", area:"塩沢", desc:"自社米粉を使用したグルテンフリーのドーナツ店。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.043, lng:138.85, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["米粉ドーナツ","グルテンフリー","公式サイト掲載"] },
@@ -1288,10 +1317,10 @@ const SPOTS = [
   { id:"ov23", name:"越後屋酒店", genre:"買物", area:"塩沢", desc:"石打駅最寄り、石打丸山スキー場から徒歩9分。種類豊富なお酒。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.044, lng:138.852, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["酒屋","地酒","公式サイト掲載"] },
   { id:"ov24", name:"大門屋酒店", genre:"買物", area:"六日町", desc:"八海山・鶴齢・高千代など地元三蔵のお酒を取り揃える。店内で角打ちができるのも嬉しい。", niche:"", address:"南魚沼市(六日町地域)", lat:37.066, lng:138.873, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["地酒","角打ち","公式サイト掲載"] },
   { id:"ov25", name:"桜井酒店", genre:"買物", area:"六日町", desc:"六日町駅裏、昭和39年創業の老舗酒屋がカフェ風のおしゃれな角打ちにリニューアル。限定酒などレアなお酒も。", niche:"", address:"南魚沼市(六日町地域)", lat:37.061, lng:138.884, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["角打ち","限定酒","地酒","公式サイト掲載"] },
-  { id:"ov26", name:"アグリコア越後ワイナリー", genre:"買物", area:"大和", desc:"雪室見学や試飲が楽しめるワイナリー。葡萄畑を眺めるワインレストランやクレープショップも併設。", niche:"", address:"南魚沼市(大和地域)", lat:37.146, lng:138.909, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ワイナリー","雪室見学","レストラン","公式サイト掲載"] },
+  { id:"ov26", name:"アグリコア越後ワイナリー", genre:"買物", area:"大和", desc:"雪室見学や試飲が楽しめるワイナリー。葡萄畑を眺めるワインレストランやクレープショップも併設。", niche:"", address:"南魚沼市浦佐5531-1", lat:37.146, lng:138.909, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ワイナリー","雪室見学","レストラン","公式サイト掲載"] },
   { id:"ov27", name:"玉屋菓子店", genre:"買物", area:"大和", desc:"浦佐駅から徒歩4分。しんこ餅が名物の和菓子屋。", niche:"", address:"南魚沼市(大和地域)", lat:37.162, lng:138.92, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["しんこ餅","和菓子","公式サイト掲載"] },
   { id:"ov28", name:"おかしとおやき ことう", genre:"買物", area:"六日町", desc:"直江兼続にちなんだ六日町名物「お六饅頭」をはじめ、おやき、笹団子など。", niche:"", address:"南魚沼市(六日町地域)", lat:37.067, lng:138.875, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["お六饅頭","おやき","笹団子","公式サイト掲載"] },
-  { id:"ov29", name:"青木酒造 小売売店", genre:"買物", area:"塩沢", desc:"「鶴齢」で知られる魚沼の造り酒屋。牧之通りの売店に立ち寄りたい。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.035, lng:138.855, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["鶴齢","日本酒","牧之通り","公式サイト掲載"] },
+  { id:"ov29", name:"青木酒造 小売売店", genre:"買物", area:"塩沢", desc:"「鶴齢」で知られる魚沼の造り酒屋。牧之通りの売店に立ち寄りたい。", niche:"", address:"南魚沼市塩沢1214", lat:37.035, lng:138.855, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["鶴齢","日本酒","牧之通り","公式サイト掲載"] },
   { id:"ov30", name:"たいせいや", genre:"買物", area:"六日町", desc:"六日町中心部の酒屋。大きなバドワイザーの看板が目印。", niche:"", address:"南魚沼市(六日町地域)", lat:37.057, lng:138.876, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["酒屋","公式サイト掲載"] },
   { id:"ov31", name:"金田屋酒店", genre:"買物", area:"大和", desc:"浦佐駅・毘沙門天口より徒歩2分。日本酒の種類が豊富。", niche:"", address:"南魚沼市(大和地域)", lat:37.163, lng:138.922, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日本酒","浦佐駅","公式サイト掲載"] },
   { id:"ov32", name:"酒ゃビック 塩沢店", genre:"買物", area:"塩沢", desc:"塩沢石打ICから車で5分。新潟の地酒、ワイン、焼酎、ウイスキーなど豊富な品揃え。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.041, lng:138.846, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["地酒","酒屋","公式サイト掲載"] },
@@ -1299,13 +1328,13 @@ const SPOTS = [
   { id:"ov34", name:"利七屋", genre:"買物", area:"塩沢", desc:"牧之通りに店を構える土産処。お米・お酒をはじめ越後魚沼・新潟の特産品。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.031, lng:138.847, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["土産","牧之通り","公式サイト掲載"] },
   { id:"ov35", name:"金沢屋酒店", genre:"買物", area:"塩沢", desc:"元は銘酒の蔵元だった酒店。鶴齢・高千代は他店にない特別なお酒も取り扱う。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.047, lng:138.858, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["鶴齢","高千代","日本酒","公式サイト掲載"] },
   { id:"ov36", name:"巻機山麓キャンプ場", genre:"自然", area:"塩沢", desc:"巻機山登山口に位置する標高約700mのキャンプ場。ロケーション抜群で登山基地に最適。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.042, lng:138.848, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","登山","公式サイト掲載"] },
-  { id:"ov37", name:"大崎ダムキャンプ場", genre:"自然", area:"大和", desc:"桜や八色ツツジに包まれた自然豊かな公園のキャンプ場。春は湖面に鯉のぼりが泳ぐ。BBQ施設も。", niche:"", address:"南魚沼市(大和地域)", lat:37.154, lng:138.925, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","桜","BBQ","公式サイト掲載"] },
+  { id:"ov37", name:"大崎ダムキャンプ場", genre:"自然", area:"大和", desc:"桜や八色ツツジに包まれた自然豊かな公園のキャンプ場。春は湖面に鯉のぼりが泳ぐ。BBQ施設も。", niche:"", address:"南魚沼市大崎3715-1", lat:37.154, lng:138.925, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","桜","BBQ","公式サイト掲載"] },
   { id:"ov38", name:"丹後山", genre:"自然", area:"六日町", desc:"利根川の源流・大水上山や越後三山への縦走路。鉄骨2階建ての無人避難小屋あり。", niche:"", address:"南魚沼市(六日町地域)", lat:37.059, lng:138.88, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["登山","縦走","公式サイト掲載"] },
   { id:"ov39", name:"中ノ岳", genre:"自然", area:"六日町", desc:"越後三山の中央で最も標高が高い山。「お月山」とも呼ばれる。十字峡から頂上まで約6時間。", niche:"", address:"南魚沼市(六日町地域)", lat:37.075, lng:138.891, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["登山","越後三山","公式サイト掲載"] },
   { id:"ov40", name:"VOICE STUDIO COMPANY", genre:"観光", area:"塩沢", desc:"陶芸1日体験と陶芸教室。電動ロクロと手びねりを専門スタッフが丁寧にサポート。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.043, lng:138.85, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["陶芸体験","公式サイト掲載"] },
-  { id:"ov41", name:"天昌寺", genre:"観光", area:"塩沢", desc:"越後観音礼所十二番霊場。県指定文化財の木造観世音菩薩坐像など。『北越雪譜』「寺のなだれ」の舞台。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.038, lng:138.861, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["寺社","北越雪譜","文化財","公式サイト掲載"] },
+  { id:"ov41", name:"天昌寺", genre:"観光", area:"塩沢", desc:"越後観音礼所十二番霊場。県指定文化財の木造観世音菩薩坐像など。『北越雪譜』「寺のなだれ」の舞台。", niche:"", address:"南魚沼市思川39", lat:37.038, lng:138.861, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["寺社","北越雪譜","文化財","公式サイト掲載"] },
   { id:"ov42", name:"長恩寺", genre:"観光", area:"塩沢", desc:"県指定天然記念物・推定樹齢200年のオハツキイチョウがシンボル。鈴木牧之の菩提寺。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.033, lng:138.851, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["寺社","イチョウ","鈴木牧之","公式サイト掲載"] },
-  { id:"ov43", name:"塩沢中央公園(ふれあい公園)", genre:"観光", area:"塩沢", desc:"大きなゾウさん滑り台が特徴で「ゾウさん公園」の愛称で親しまれる。小さな子から小学生まで。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.028, lng:138.841, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["公園","ファミリー","公式サイト掲載"] },
+  { id:"ov43", name:"塩沢中央公園(ふれあい公園)", genre:"観光", area:"塩沢", desc:"大きなゾウさん滑り台が特徴で「ゾウさん公園」の愛称で親しまれる。小さな子から小学生まで。", niche:"", address:"南魚沼市塩沢1112-36", lat:37.028, lng:138.841, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["公園","ファミリー","公式サイト掲載"] },
   { id:"ov44", name:"わらびのオートキャンプ場", genre:"自然", area:"六日町", desc:"高台に位置し見晴らしと風抜け抜群のキャンプ場。コテージや屋根付き炊事場も。", niche:"", address:"南魚沼市(六日町地域)", lat:37.071, lng:138.883, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","コテージ","公式サイト掲載"] },
   { id:"ov45", name:"石打ユングパルナス オートキャンプ場", genre:"自然", area:"塩沢", desc:"湯沢ICから約10分。100V電源付きオートサイト、和を感じる区画サイト。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.039, lng:138.842, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["オートキャンプ","温泉隣接","公式サイト掲載"] },
   { id:"ov46", name:"上の原キャンプ場", genre:"自然", area:"六日町", desc:"上の原公園の芝生サイト。周囲に菖蒲園、お松の池では釣りや足湯も。", niche:"", address:"南魚沼市(六日町地域)", lat:37.061, lng:138.884, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","足湯","公式サイト掲載"] },
@@ -1316,68 +1345,68 @@ const SPOTS = [
   { id:"ov51", name:"金剛霊泉", genre:"自然", area:"大和", desc:"八海山中腹の岩盤から湧く水。年中湧水量・温度が変わらず、登山者に活力を与える。", niche:"", address:"南魚沼市(大和地域)", lat:37.147, lng:138.911, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["湧水","八海山","公式サイト掲載"] },
   { id:"ov52", name:"滝谷の清水", genre:"自然", area:"大和", desc:"国道291号沿い大前神社入口の湧水。水量豊富で大崎菜の栽培にも利用。", niche:"", address:"南魚沼市(大和地域)", lat:37.163, lng:138.922, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["湧水","公式サイト掲載"] },
   { id:"ov53", name:"雷電様の水", genre:"自然", area:"六日町", desc:"桂山裾野の巨岩より湧出。水道水源や清酒の源水にも利用される名水。", niche:"", address:"南魚沼市(六日町地域)", lat:37.068, lng:138.877, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["湧水","名水","公式サイト掲載"] },
-  { id:"ov54", name:"舞子高原オートキャンプ場", genre:"自然", area:"塩沢", desc:"スキー場ならではの見晴らし。グランピング、オートキャンプ、BBQ、フォレストアドベンチャーまで。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.036, lng:138.857, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["オートキャンプ","グランピング","公式サイト掲載"] },
+  { id:"ov54", name:"舞子高原オートキャンプ場", genre:"自然", area:"塩沢", desc:"スキー場ならではの見晴らし。グランピング、オートキャンプ、BBQ、フォレストアドベンチャーまで。", niche:"", address:"南魚沼市舞子2056-108", lat:37.036, lng:138.857, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["オートキャンプ","グランピング","公式サイト掲載"] },
   { id:"ov55", name:"越後駒ケ岳", genre:"自然", area:"大和", desc:"日本百名山。鮮やかな稜線とダイナミックな大障壁。山頂から八海山や中ノ岳を見渡せる。", niche:"", address:"南魚沼市(大和地域)", lat:37.148, lng:138.913, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日本百名山","登山","越後三山","公式サイト掲載"] },
   { id:"ov56", name:"金城山", genre:"自然", area:"六日町", desc:"塩沢盆地の正面にそびえる「金」の字に似た山。頂上に大岩窟「おむろ」、壮大な岩壁「百間ベザイ」。", niche:"", address:"南魚沼市(六日町地域)", lat:37.074, lng:138.889, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["登山","岩峰","公式サイト掲載"] },
   { id:"ov57", name:"八海山(登山)", genre:"自然", area:"六日町", desc:"標高1,778m、古くから山岳信仰の霊山。鎖場が続くスリル満点のコースやロープウェーで4合目まで行けるコースも。", niche:"", address:"南魚沼市(六日町地域)", lat:37.069, lng:138.879, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["霊山","登山","鎖場","公式サイト掲載"] },
   { id:"ov58", name:"飯士山", genre:"自然", area:"塩沢", desc:"上田富士とも呼ばれる秀麗な山。奇岩「負欠岩」は一見の価値あり。山頂は360度の展望。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.037, lng:138.859, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["登山","展望","公式サイト掲載"] },
   { id:"ov59", name:"南魚沼市トレーニングセンター", genre:"観光", area:"塩沢", desc:"市初の本格ボルダリング・トランポリン施設。トランポリンは国際体操連盟公式競技認定品。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.032, lng:138.849, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ボルダリング","トランポリン","公式サイト掲載"] },
   { id:"ov60", name:"お松の池", genre:"自然", area:"六日町", desc:"春は桜、夏はスイレン。約1kmの遊歩道。近くに菖蒲園や足湯も。", niche:"", address:"南魚沼市(六日町地域)", lat:37.075, lng:138.891, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["桜","散策","公式サイト掲載"] },
-  { id:"ov61", name:"上越国際プレイランド", genre:"観光", area:"塩沢", desc:"全長150mのウォーターボブスレーや川下り「ワイルドリバー」。ゴーカートなど1日では遊びきれない。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.043, lng:138.85, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["プール","遊園地","ファミリー","公式サイト掲載"] },
+  { id:"ov61", name:"上越国際プレイランド", genre:"観光", area:"塩沢", desc:"全長150mのウォーターボブスレーや川下り「ワイルドリバー」。ゴーカートなど1日では遊びきれない。", niche:"", address:"南魚沼市樺野沢112-1", lat:37.043, lng:138.85, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["プール","遊園地","ファミリー","公式サイト掲載"] },
   { id:"ov62", name:"穴地十二大明神", genre:"観光", area:"大和", desc:"「越後のミケランジェロ」石川雲蝶の作品が残る鎮守様。", niche:"", address:"南魚沼市(大和地域)", lat:37.155, lng:138.927, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["石川雲蝶","寺社","公式サイト掲載"] },
-  { id:"ov63", name:"龍谷寺", genre:"観光", area:"大和", desc:"宝暦10年再建の本堂は豪雪地帯の代表的禅建築。インドグプタ様式の慈雲閣観音堂も。", niche:"", address:"南魚沼市(大和地域)", lat:37.15, lng:138.917, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["寺社","禅建築","公式サイト掲載"] },
-  { id:"ov64", name:"大崎ダム公園", genre:"観光", area:"大和", desc:"八重桜・染井吉野など約200本の桜。手作りこいのぼりが湖上を泳ぐ。", niche:"", address:"南魚沼市(大和地域)", lat:37.145, lng:138.907, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["桜","こいのぼり","ピクニック","公式サイト掲載"] },
-  { id:"ov65", name:"八海山尊神社", genre:"観光", area:"大和", desc:"信仰の山・八海山を祀る。御影石一枚岩の鳥居としては日本一の大鳥居。10月の大火渡祭。", niche:"", address:"南魚沼市(大和地域)", lat:37.161, lng:138.918, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["神社","大鳥居","火渡り","公式サイト掲載"] },
-  { id:"ov66", name:"八海神社", genre:"観光", area:"六日町", desc:"うっそうとした杉並木の参道。夫婦杉が多く、夫婦和合と子宝安産を願う参拝者が訪れる。", niche:"", address:"南魚沼市(六日町地域)", lat:37.066, lng:138.873, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["神社","杉並木","夫婦杉","公式サイト掲載"] },
+  { id:"ov63", name:"龍谷寺", genre:"観光", area:"大和", desc:"宝暦10年再建の本堂は豪雪地帯の代表的禅建築。インドグプタ様式の慈雲閣観音堂も。", niche:"", address:"南魚沼市大崎3455", lat:37.15, lng:138.917, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["寺社","禅建築","公式サイト掲載"] },
+  { id:"ov64", name:"大崎ダム公園", genre:"観光", area:"大和", desc:"八重桜・染井吉野など約200本の桜。手作りこいのぼりが湖上を泳ぐ。", niche:"", address:"南魚沼市大崎3715-1", lat:37.145, lng:138.907, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["桜","こいのぼり","ピクニック","公式サイト掲載"] },
+  { id:"ov65", name:"八海山尊神社", genre:"観光", area:"大和", desc:"信仰の山・八海山を祀る。御影石一枚岩の鳥居としては日本一の大鳥居。10月の大火渡祭。", niche:"", address:"南魚沼市大崎4161", lat:37.161, lng:138.918, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["神社","大鳥居","火渡り","公式サイト掲載"] },
+  { id:"ov66", name:"八海神社", genre:"観光", area:"六日町", desc:"うっそうとした杉並木の参道。夫婦杉が多く、夫婦和合と子宝安産を願う参拝者が訪れる。", niche:"", address:"南魚沼市山口494", lat:37.066, lng:138.873, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["神社","杉並木","夫婦杉","公式サイト掲載"] },
   { id:"ov67", name:"五日町天池教育キャンプ場", genre:"自然", area:"六日町", desc:"スキー場中腹のキャンプ場。八海山・巻機山が眼前に迫り、魚野川を一望。", niche:"", address:"南魚沼市(六日町地域)", lat:37.061, lng:138.884, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","眺望","公式サイト掲載"] },
   { id:"ov68", name:"十字峡", genre:"自然", area:"六日町", desc:"3つの川が「十」の字に合流する珍しいスポット。親水公園完備で水遊びや釣りも。", niche:"", address:"南魚沼市(六日町地域)", lat:37.056, lng:138.874, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["渓谷","水遊び","紅葉","公式サイト掲載"] },
-  { id:"ov69", name:"五十沢キャンプ場", genre:"自然", area:"六日町", desc:"広さ3万㎡の広大なキャンプ場。山菜、渓流釣り、紅葉、きのこ採り。コテージ完備。", niche:"", address:"南魚沼市(六日町地域)", lat:37.072, lng:138.885, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","渓流釣り","公式サイト掲載"] },
-  { id:"ov70", name:"直江兼続公伝世館", genre:"観光", area:"六日町", desc:"銭淵公園内、直江兼続の生家をイメージした史料館。軍配・変わり兜や坂戸城のジオラマ。", niche:"", address:"南魚沼市(六日町地域)", lat:37.067, lng:138.875, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["直江兼続","歴史","公式サイト掲載"] },
+  { id:"ov69", name:"五十沢キャンプ場", genre:"自然", area:"六日町", desc:"広さ3万㎡の広大なキャンプ場。山菜、渓流釣り、紅葉、きのこ採り。コテージ完備。", niche:"", address:"南魚沼市永松941", lat:37.072, lng:138.885, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["キャンプ","渓流釣り","公式サイト掲載"] },
+  { id:"ov70", name:"直江兼続公伝世館", genre:"観光", area:"六日町", desc:"銭淵公園内、直江兼続の生家をイメージした史料館。軍配・変わり兜や坂戸城のジオラマ。", niche:"", address:"南魚沼市坂戸393-2", lat:37.067, lng:138.875, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["直江兼続","歴史","公式サイト掲載"] },
   { id:"ov71", name:"かまくら桜ヶ丘公園", genre:"観光", area:"塩沢", desc:"地元の人もあまり知らない桜の穴場スポット。市登録有形文化財の古い砂防施設も。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.035, lng:138.855, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["桜","穴場","公式サイト掲載"] },
   { id:"ov72", name:"小栗山サンスポーツランド スケートパーク", genre:"観光", area:"六日町", desc:"公設では県内初の屋外全面コンクリート製スケートパーク。2100㎡でスケボー・BMX。", niche:"", address:"南魚沼市(六日町地域)", lat:37.057, lng:138.876, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スケボー","BMX","公式サイト掲載"] },
-  { id:"ov73", name:"龍澤寺", genre:"観光", area:"塩沢", desc:"上杉謙信の御朱印状(市指定文化財)を有する古刹。魚沼三十三番霊場の第二十三番札所。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.046, lng:138.856, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["寺社","上杉家","公式サイト掲載"] },
+  { id:"ov73", name:"龍澤寺", genre:"観光", area:"塩沢", desc:"上杉謙信の御朱印状(市指定文化財)を有する古刹。魚沼三十三番霊場の第二十三番札所。", niche:"", address:"南魚沼市樺野沢30", lat:37.046, lng:138.856, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["寺社","上杉家","公式サイト掲載"] },
   { id:"ov74", name:"一宮神社", genre:"観光", area:"塩沢", desc:"江戸時代から農作の神として信仰。竹細工やわら細工の店が立ち並ぶ市(いち)が有名。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.041, lng:138.846, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["神社","市","公式サイト掲載"] },
   { id:"ov75", name:"登川河川公園", genre:"自然", area:"塩沢", desc:"登川沿いの河川公園。サイクリングコースや親水護岸された水遊び場。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.036, lng:138.857, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["水遊び","サイクリング","公式サイト掲載"] },
   { id:"ov76", name:"石上神社", genre:"観光", area:"塩沢", desc:"横山大観、山本五十六ら一流の書画69点が格天井として献上されている。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.031, lng:138.847, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["神社","格天井","公式サイト掲載"] },
-  { id:"ov77", name:"外山康雄 野の花館", genre:"観光", area:"塩沢", desc:"古民家を再生したギャラリー。野の花の水彩画を展示。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.047, lng:138.858, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ギャラリー","古民家","公式サイト掲載"] },
-  { id:"ov78", name:"大原運動公園", genre:"観光", area:"塩沢", desc:"野球場、テニスコート20面、多目的グラウンド。スポーツ合宿におすすめ。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.042, lng:138.848, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スポーツ","合宿","公式サイト掲載"] },
-  { id:"ov79", name:"ザ・ヴェランダ石打丸山", genre:"観光", area:"塩沢", desc:"石打丸山スキー場の夏のビュースポット。展望テラスから南魚沼の田園風景と越後三山の絶景。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.037, lng:138.859, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["絶景","テラス","夏季","公式サイト掲載"] },
-  { id:"ov80", name:"八海山麓スキー場", genre:"観光", area:"大和", desc:"眺望と緩急の変化に富んだ10コース。ソリ専用ゲレンデもありファミリーに人気。", niche:"", address:"南魚沼市(大和地域)", lat:37.149, lng:138.915, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","ファミリー","公式サイト掲載"] },
-  { id:"ov81", name:"六日町八海山スキー場", genre:"観光", area:"六日町", desc:"八海山を象徴するダウンヒルコース・コブ斜面・深雪が楽しめる全15コース。", niche:"", address:"南魚沼市(六日町地域)", lat:37.075, lng:138.891, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","上級者","公式サイト掲載"] },
-  { id:"ov82", name:"ムイカスノーリゾート", genre:"観光", area:"六日町", desc:"六日町ICより5分。最大幅200mの広々ゲレンデと南魚沼一望の絶景。ファミリー・ビギナー向き。", niche:"", address:"南魚沼市(六日町地域)", lat:37.07, lng:138.881, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","ファミリー","公式サイト掲載"] },
-  { id:"ov83", name:"シャトー塩沢スキー場", genre:"観光", area:"塩沢", desc:"アットホームな雰囲気。キッズ向けメニューやファミリー向けイベント満載。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.038, lng:138.861, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","ファミリー","公式サイト掲載"] },
-  { id:"ov84", name:"浦佐温泉 たもん荘", genre:"温泉", area:"大和", desc:"手づくり料理が自慢の宿。日帰り入浴大人500円とリーズナブル。", niche:"", address:"南魚沼市(大和地域)", lat:37.15, lng:138.917, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","500円","宿泊可","公式サイト掲載"] },
-  { id:"ov85", name:"浦佐温泉 てじまや", genre:"温泉", area:"大和", desc:"浦佐駅徒歩10分。空気に触れると赤褐色に変わるにごり湯。露天風呂あり。知る人ぞ知る温泉。", niche:"", address:"南魚沼市(大和地域)", lat:37.145, lng:138.907, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["にごり湯","露天風呂","宿泊可","公式サイト掲載"] },
-  { id:"ov86", name:"樺野沢温泉 ホテルグリーンプラザ上越", genre:"温泉", area:"塩沢", desc:"上越国際プレイランド併設。自家源泉の肌にやさしい湯。アフタースキーにも。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.044, lng:138.852, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","スキー","宿泊可","公式サイト掲載"] },
-  { id:"ov87", name:"舞子温泉 舞子高原ホテル", genre:"温泉", area:"塩沢", desc:"開放感あふれるオープンジャグジーと弱アルカリ性のやわらかな湯。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.039, lng:138.842, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ジャグジー","リゾート","宿泊可","公式サイト掲載"] },
-  { id:"ov88", name:"島新田温泉 金城の里", genre:"温泉", area:"六日町", desc:"無色透明のやわらかな泉質。格安で楽しめる日帰り温泉の穴場。源泉かけ流し。", niche:"", address:"南魚沼市(六日町地域)", lat:37.061, lng:138.884, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","穴場","源泉かけ流し","公式サイト掲載"] },
-  { id:"ov89", name:"上野鉱泉", genre:"温泉", area:"塩沢", desc:"明治以来の湯治場。総硫黄成分を多く含む療養冷温泉。中の湯・名月荘・松寿館の3宿。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.029, lng:138.843, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["湯治","硫黄泉","宿泊可","公式サイト掲載"] },
-  { id:"ov90", name:"丸山温泉 ホテル古城館", genre:"温泉", area:"塩沢", desc:"石打丸山スキー場麓。塩化物泉では越後随一の泉質。疲労回復や婦人病に効能。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.045, lng:138.854, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["塩化物泉","スキー","宿泊可","公式サイト掲載"] },
-  { id:"ov91", name:"ハツカ石温泉 石打ユングパルナス", genre:"温泉", area:"塩沢", desc:"絶景露天風呂、薬湯、立ち湯、寝湯など多彩な湯めぐり。石打丸山スキー場隣接。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.04, lng:138.844, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["露天風呂","日帰り温泉","宿泊可","公式サイト掲載"] },
+  { id:"ov77", name:"外山康雄 野の花館", genre:"観光", area:"塩沢", desc:"古民家を再生したギャラリー。野の花の水彩画を展示。", niche:"", address:"南魚沼市万条新田371-1", lat:37.047, lng:138.858, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ギャラリー","古民家","公式サイト掲載"] },
+  { id:"ov78", name:"大原運動公園", genre:"観光", area:"塩沢", desc:"野球場、テニスコート20面、多目的グラウンド。スポーツ合宿におすすめ。", niche:"", address:"南魚沼市万条新田417", lat:37.042, lng:138.848, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スポーツ","合宿","公式サイト掲載"] },
+  { id:"ov79", name:"ザ・ヴェランダ石打丸山", genre:"観光", area:"塩沢", desc:"石打丸山スキー場の夏のビュースポット。展望テラスから南魚沼の田園風景と越後三山の絶景。", niche:"", address:"南魚沼市石打1699", lat:37.037, lng:138.859, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["絶景","テラス","夏季","公式サイト掲載"] },
+  { id:"ov80", name:"八海山麓スキー場", genre:"観光", area:"大和", desc:"眺望と緩急の変化に富んだ10コース。ソリ専用ゲレンデもありファミリーに人気。", niche:"", address:"南魚沼市荒金56-1", lat:37.149, lng:138.915, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","ファミリー","公式サイト掲載"] },
+  { id:"ov81", name:"六日町八海山スキー場", genre:"観光", area:"六日町", desc:"八海山を象徴するダウンヒルコース・コブ斜面・深雪が楽しめる全15コース。", niche:"", address:"南魚沼市山口1610", lat:37.075, lng:138.891, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","上級者","公式サイト掲載"] },
+  { id:"ov82", name:"ムイカスノーリゾート", genre:"観光", area:"六日町", desc:"六日町ICより5分。最大幅200mの広々ゲレンデと南魚沼一望の絶景。ファミリー・ビギナー向き。", niche:"", address:"南魚沼市小栗山2910-114", lat:37.07, lng:138.881, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","ファミリー","公式サイト掲載"] },
+  { id:"ov83", name:"シャトー塩沢スキー場", genre:"観光", area:"塩沢", desc:"アットホームな雰囲気。キッズ向けメニューやファミリー向けイベント満載。", niche:"", address:"南魚沼市吉里1562", lat:37.038, lng:138.861, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スキー場","ファミリー","公式サイト掲載"] },
+  { id:"ov84", name:"浦佐温泉 たもん荘", genre:"温泉", area:"大和", desc:"手づくり料理が自慢の宿。日帰り入浴大人500円とリーズナブル。", niche:"", address:"南魚沼市浦佐219-1", lat:37.15, lng:138.917, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","500円","宿泊可","公式サイト掲載"] },
+  { id:"ov85", name:"浦佐温泉 てじまや", genre:"温泉", area:"大和", desc:"浦佐駅徒歩10分。空気に触れると赤褐色に変わるにごり湯。露天風呂あり。知る人ぞ知る温泉。", niche:"", address:"南魚沼市浦佐218-1", lat:37.145, lng:138.907, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["にごり湯","露天風呂","宿泊可","公式サイト掲載"] },
+  { id:"ov86", name:"樺野沢温泉 ホテルグリーンプラザ上越", genre:"温泉", area:"塩沢", desc:"上越国際プレイランド併設。自家源泉の肌にやさしい湯。アフタースキーにも。", niche:"", address:"南魚沼市樺野沢112-1", lat:37.044, lng:138.852, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","スキー","宿泊可","公式サイト掲載"] },
+  { id:"ov87", name:"舞子温泉 舞子高原ホテル", genre:"温泉", area:"塩沢", desc:"開放感あふれるオープンジャグジーと弱アルカリ性のやわらかな湯。", niche:"", address:"南魚沼市舞子2056-108", lat:37.039, lng:138.842, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ジャグジー","リゾート","宿泊可","公式サイト掲載"] },
+  { id:"ov88", name:"島新田温泉 金城の里", genre:"温泉", area:"六日町", desc:"無色透明のやわらかな泉質。格安で楽しめる日帰り温泉の穴場。源泉かけ流し。", niche:"", address:"南魚沼市島新田764-2", lat:37.061, lng:138.884, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","穴場","源泉かけ流し","公式サイト掲載"] },
+  { id:"ov89", name:"上野鉱泉", genre:"温泉", area:"塩沢", desc:"明治以来の湯治場。総硫黄成分を多く含む療養冷温泉。中の湯・名月荘・松寿館の3宿。", niche:"", address:"南魚沼市上野345", lat:37.029, lng:138.843, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["湯治","硫黄泉","宿泊可","公式サイト掲載"] },
+  { id:"ov90", name:"丸山温泉 ホテル古城館", genre:"温泉", area:"塩沢", desc:"石打丸山スキー場麓。塩化物泉では越後随一の泉質。疲労回復や婦人病に効能。", niche:"", address:"南魚沼市石打1873", lat:37.045, lng:138.854, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["塩化物泉","スキー","宿泊可","公式サイト掲載"] },
+  { id:"ov91", name:"ハツカ石温泉 石打ユングパルナス", genre:"温泉", area:"塩沢", desc:"絶景露天風呂、薬湯、立ち湯、寝湯など多彩な湯めぐり。石打丸山スキー場隣接。", niche:"", address:"南魚沼市石打946", lat:37.04, lng:138.844, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["露天風呂","日帰り温泉","宿泊可","公式サイト掲載"] },
   { id:"ov92", name:"足湯 六日町温泉郵便局", genre:"温泉", area:"六日町", desc:"郵便局の玄関脇にある源泉かけ流しの足湯。六日町駅西口から徒歩3分。無料。", niche:"", address:"南魚沼市(六日町地域)", lat:37.062, lng:138.886, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["足湯","無料","駅近","公式サイト掲載"] },
   { id:"ov93", name:"足湯 お松の湯", genre:"温泉", area:"六日町", desc:"お松の池近く、菖蒲園脇の足湯。源泉直引きの掛け流しで少し熱め。無料。", niche:"", address:"南魚沼市(六日町地域)", lat:37.057, lng:138.876, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["足湯","無料","公式サイト掲載"] },
   { id:"ov94", name:"足湯 お六の湯", genre:"温泉", area:"六日町", desc:"直江兼続の幼名「お六」にちなむ足湯。坂戸山や魚野川を眺めながら楽しめる。無料。", niche:"", address:"南魚沼市(六日町地域)", lat:37.073, lng:138.887, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["足湯","無料","眺望","公式サイト掲載"] },
   { id:"ov95", name:"足湯 孫助の湯", genre:"温泉", area:"大和", desc:"旅館てじまやにある足湯。光に反射すると黄金の湯のように見える赤褐色。源泉かけ流し。無料。", niche:"", address:"南魚沼市(大和地域)", lat:37.158, lng:138.912, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["足湯","無料","にごり湯","公式サイト掲載"] },
-  { id:"ov96", name:"萌気園 さくり温泉健康館", genre:"温泉", area:"六日町", desc:"地元の憩いの場。ロビー・休憩スペース・お茶・貸しタオル無料が嬉しい。", niche:"", address:"南魚沼市(六日町地域)", lat:37.063, lng:138.888, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","無料タオル","公式サイト掲載"] },
-  { id:"ov97", name:"シャトーテル塩沢", genre:"宿泊", area:"塩沢", desc:"田植え・笹だんご作り・野菜収穫・川遊びなど様々な田舎体験ができるホテル。シャトー塩沢スキー場に隣接。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.031, lng:138.847, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["体験","ファミリー","ホテル","公式サイト掲載"] },
-  { id:"ov98", name:"ほてる木の芽坂", genre:"宿泊", area:"六日町", desc:"国民保養温泉地・六日町温泉の旅館。", niche:"", address:"南魚沼市(六日町地域)", lat:37.074, lng:138.889, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["六日町温泉","旅館","公式サイト掲載"] },
-  { id:"ov99", name:"旬彩の庄 坂戸城", genre:"宿泊", area:"六日町", desc:"六日町温泉の旅館。旬の彩り料理が自慢。", niche:"", address:"南魚沼市(六日町地域)", lat:37.069, lng:138.879, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["六日町温泉","旅館","公式サイト掲載"] },
+  { id:"ov96", name:"萌気園 さくり温泉健康館", genre:"温泉", area:"六日町", desc:"地元の憩いの場。ロビー・休憩スペース・お茶・貸しタオル無料が嬉しい。", niche:"", address:"南魚沼市宮1119", lat:37.063, lng:138.888, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["日帰り温泉","無料タオル","公式サイト掲載"] },
+  { id:"ov97", name:"シャトーテル塩沢", genre:"宿泊", area:"塩沢", desc:"田植え・笹だんご作り・野菜収穫・川遊びなど様々な田舎体験ができるホテル。シャトー塩沢スキー場に隣接。", niche:"", address:"南魚沼市塩沢2071", lat:37.031, lng:138.847, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["体験","ファミリー","ホテル","公式サイト掲載"] },
+  { id:"ov98", name:"ほてる木の芽坂", genre:"宿泊", area:"六日町", desc:"国民保養温泉地・六日町温泉の旅館。", niche:"", address:"南魚沼市小栗山93-1", lat:37.074, lng:138.889, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["六日町温泉","旅館","公式サイト掲載"] },
+  { id:"ov99", name:"旬彩の庄 坂戸城", genre:"宿泊", area:"六日町", desc:"六日町温泉の旅館。旬の彩り料理が自慢。", niche:"", address:"南魚沼市坂戸292-4", lat:37.069, lng:138.879, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["六日町温泉","旅館","公式サイト掲載"] },
   { id:"ov100", name:"彩食一心 金誠館", genre:"宿泊", area:"六日町", desc:"六日町温泉の旅館。", niche:"", address:"南魚沼市(六日町地域)", lat:37.064, lng:138.89, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["六日町温泉","旅館","公式サイト掲載"] },
   { id:"ov101", name:"日章館", genre:"宿泊", area:"六日町", desc:"六日町温泉の旅館。", niche:"", address:"南魚沼市(六日町地域)", lat:37.059, lng:138.88, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["六日町温泉","公式サイト掲載"] },
   { id:"ov102", name:"越前屋旅館", genre:"宿泊", area:"六日町", desc:"六日町温泉の旅館。", niche:"", address:"南魚沼市(六日町地域)", lat:37.075, lng:138.891, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["六日町温泉","公式サイト掲載"] },
   { id:"ov103", name:"魚沼の隠れ温泉 くつろぎ庵", genre:"宿泊", area:"六日町", desc:"一日三組だけの隠れ宿。貸切露天風呂・貸切内風呂・足湯すべて源泉掛け流し。", niche:"", address:"南魚沼市(六日町地域)", lat:37.07, lng:138.881, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["隠れ宿","貸切風呂","源泉かけ流し","公式サイト掲載"] },
-  { id:"ov104", name:"ホテル ダ フェールイン六日町", genre:"宿泊", area:"六日町", desc:"魚野川と魚沼の山々を望む源泉かけ流しの展望浴場を備えるホテル。", niche:"", address:"南魚沼市(六日町地域)", lat:37.065, lng:138.892, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["温泉","展望風呂","ビジネス","公式サイト掲載"] },
+  { id:"ov104", name:"ホテル ダ フェールイン六日町", genre:"宿泊", area:"六日町", desc:"魚野川と魚沼の山々を望む源泉かけ流しの展望浴場を備えるホテル。", niche:"", address:"南魚沼市六日町1418", lat:37.065, lng:138.892, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["温泉","展望風呂","ビジネス","公式サイト掲載"] },
   { id:"ov105", name:"大和屋旅館", genre:"宿泊", area:"六日町", desc:"六日町駅から徒歩1分。源泉かけ流しの温泉付き旅館。", niche:"", address:"南魚沼市(六日町地域)", lat:37.06, lng:138.882, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["駅近","源泉かけ流し","公式サイト掲載"] },
-  { id:"ov106", name:"むいか温泉ホテル", genre:"宿泊", area:"六日町", desc:"国民保養温泉地・六日町温泉。無色無臭で湯冷めしにくい体にやさしいお湯。越後三山の眺望。", niche:"", address:"南魚沼市(六日町地域)", lat:37.055, lng:138.872, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["温泉","眺望","スキー","公式サイト掲載"] },
-  { id:"ov107", name:"心と体の保養の宿 龍氣", genre:"宿泊", area:"六日町", desc:"療養効果を高めた5種の湯と15種類の薬石を敷き詰めた健康風呂。", niche:"", address:"南魚沼市(六日町地域)", lat:37.071, lng:138.883, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["温泉","健康風呂","公式サイト掲載"] },
-  { id:"ov108", name:"いろりあん", genre:"宿泊", area:"六日町", desc:"山を見渡せる露天風呂。緑や紅葉、雪見露天が楽しめる上の原高原温泉の宿。", niche:"", address:"南魚沼市(六日町地域)", lat:37.066, lng:138.873, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["露天風呂","雪見風呂","公式サイト掲載"] },
+  { id:"ov106", name:"むいか温泉ホテル", genre:"宿泊", area:"六日町", desc:"国民保養温泉地・六日町温泉。無色無臭で湯冷めしにくい体にやさしいお湯。越後三山の眺望。", niche:"", address:"南魚沼市小栗山2910-114", lat:37.055, lng:138.872, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["温泉","眺望","スキー","公式サイト掲載"] },
+  { id:"ov107", name:"心と体の保養の宿 龍氣", genre:"宿泊", area:"六日町", desc:"療養効果を高めた5種の湯と15種類の薬石を敷き詰めた健康風呂。", niche:"", address:"南魚沼市小栗山2310", lat:37.071, lng:138.883, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["温泉","健康風呂","公式サイト掲載"] },
+  { id:"ov108", name:"いろりあん", genre:"宿泊", area:"六日町", desc:"山を見渡せる露天風呂。緑や紅葉、雪見露天が楽しめる上の原高原温泉の宿。", niche:"", address:"南魚沼市小栗山2089-4", lat:37.066, lng:138.873, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["露天風呂","雪見風呂","公式サイト掲載"] },
   { id:"ov109", name:"湖畔荘", genre:"宿泊", area:"六日町", desc:"上の原高原温泉。天然温泉でゆったりのんびり。", niche:"", address:"南魚沼市(六日町地域)", lat:37.061, lng:138.884, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["上の原高原温泉","公式サイト掲載"] },
   { id:"ov110", name:"ひいらぎ山荘", genre:"宿泊", area:"六日町", desc:"天然温泉掛け流し(加熱なし・ろ過なし)。自然に恵まれた山の中の気楽な宿。", niche:"", address:"南魚沼市(六日町地域)", lat:37.056, lng:138.874, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["源泉かけ流し","公式サイト掲載"] },
   { id:"ov111", name:"武蔵ロッヂ", genre:"宿泊", area:"六日町", desc:"天然温泉かけ流しの贅沢な宿。自然の中でゆっくりと。", niche:"", address:"南魚沼市(六日町地域)", lat:37.072, lng:138.885, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["源泉かけ流し","公式サイト掲載"] },
   { id:"ov112", name:"ロッヂ 半二郎", genre:"宿泊", area:"六日町", desc:"新鮮な山の幸と温泉。雪国の我が家のような雰囲気とあったかい人情。", niche:"", address:"南魚沼市(六日町地域)", lat:37.067, lng:138.875, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["家庭的","山の幸","公式サイト掲載"] },
   { id:"ov113", name:"むつみ荘", genre:"宿泊", area:"六日町", desc:"自家製コシヒカリ食べ放題。源泉掛け流しの家庭的な小さいお宿。", niche:"", address:"南魚沼市(六日町地域)", lat:37.062, lng:138.886, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["コシヒカリ","源泉かけ流し","公式サイト掲載"] },
   { id:"ov114", name:"ロッヂ マロン", genre:"宿泊", area:"六日町", desc:"スポーツ・食べること・お酒が大好きなお客さんが集まる宿。季節の料理や満腹料理。", niche:"", address:"南魚沼市(六日町地域)", lat:37.057, lng:138.876, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["スポーツ合宿","上の原高原温泉","公式サイト掲載"] },
-  { id:"ov115", name:"大沢舘", genre:"宿泊", area:"塩沢", desc:"魚沼三山・巻機山を望む展望岩風呂と露天風呂。なめらかな美人湯。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.046, lng:138.856, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["大沢山温泉","露天風呂","美人湯","公式サイト掲載"] },
+  { id:"ov115", name:"大沢舘", genre:"宿泊", area:"塩沢", desc:"魚沼三山・巻機山を望む展望岩風呂と露天風呂。なめらかな美人湯。", niche:"", address:"南魚沼市大沢1170", lat:37.046, lng:138.856, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["大沢山温泉","露天風呂","美人湯","公式サイト掲載"] },
   { id:"ov116", name:"幽谷荘", genre:"宿泊", area:"塩沢", desc:"寛永7年開業と伝わる山あいの閑静な温泉宿。透明でツルツルのお湯。", niche:"", address:"南魚沼市(塩沢地域)", lat:37.041, lng:138.846, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["大沢山温泉","老舗","公式サイト掲載"] },
   { id:"ov117", name:"サンバレーひぐち", genre:"宿泊", area:"六日町", desc:"六日町地区の民宿・ロッヂタイプの宿。", niche:"", address:"南魚沼市(六日町地域)", lat:37.063, lng:138.888, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["民宿","公式サイト掲載"] },
   { id:"ov118", name:"河原崎 湯元館", genre:"宿泊", area:"六日町", desc:"六日町地区の宿。", niche:"", address:"南魚沼市(六日町地域)", lat:37.058, lng:138.878, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["旅館","公式サイト掲載"] },
@@ -1847,6 +1876,58 @@ renderSeasons();
 render();
 renderCourses();
 renderRoute();
+
+/* ============ ぬまマップ(ジャンル色分けピン・クラスター表示) ============ */
+const GENRE_COLORS = { "観光":"#e8a33d","自然":"#4c9a58","飲食":"#d95f43","カフェ":"#a9713a","温泉":"#3f7fb5","宿泊":"#7b5ea7","買物":"#5f7d8c","心霊":"#454c55" };
+let numaMap = null, mapCluster = null;
+const mapMarkers = {};
+const mapLegendState = {};
+
+function renderMapLegend(){
+  const el = document.getElementById("maplegend");
+  el.innerHTML = Object.keys(GENRE_COLORS).map(g =>
+    `<button class="lg-chip ${mapLegendState[g] ? "" : "off"}" data-g="${g}"><span class="dot" style="background:${GENRE_COLORS[g]}"></span>${g}</button>`).join("");
+  el.querySelectorAll(".lg-chip").forEach(b => b.onclick = () => {
+    const g = b.dataset.g;
+    mapLegendState[g] = !mapLegendState[g];
+    mapLegendState[g] ? mapCluster.addLayers(mapMarkers[g]) : mapCluster.removeLayers(mapMarkers[g]);
+    renderMapLegend();
+  });
+}
+
+function initMap(){
+  if (numaMap || typeof L === "undefined" || !document.getElementById("map")) return;
+  numaMap = L.map("map", { scrollWheelZoom:false }).setView([37.045, 138.91], 11);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom:19
+  }).addTo(numaMap);
+
+  /* 近いピンは数字の丸にまとめる。ズーム13以上でバラける */
+  mapCluster = L.markerClusterGroup({ showCoverageOnHover:false, maxClusterRadius:48, disableClusteringAtZoom:13 });
+  numaMap.addLayer(mapCluster);
+
+  Object.keys(GENRE_COLORS).forEach(g => { mapMarkers[g] = []; mapLegendState[g] = true; });
+
+  SPOTS.forEach(s => {
+    if (!s.lat || !s.lng) return;
+    const color = GENRE_COLORS[s.genre] || "#666";
+    const m = L.circleMarker([s.lat, s.lng], { radius:7, color:"#fff", weight:1.5, fillColor:color, fillOpacity:.92 });
+    m.bindTooltip(esc(s.name), { permanent:true, direction:"top", offset:[0,-7], className:"spot-label" });
+    m.bindPopup(`<b>${esc(s.name)}</b><br><span style="color:${color};font-size:.78rem">${s.genre} / ${esc(s.area)}エリア</span><br><button class="map-detail" onclick="openDetail('${s.id}')">詳細を見る →</button>`);
+    (mapMarkers[s.genre] || mapMarkers["観光"]).push(m);
+  });
+  mapCluster.addLayers([].concat(...Object.values(mapMarkers)));
+
+  /* ズーム13以上で名前ラベル表示(クラスター解除と同時) */
+  const mapEl = document.getElementById("map");
+  numaMap.on("zoomend", () => {
+    numaMap.getZoom() >= 13 ? mapEl.classList.remove("hide-labels") : mapEl.classList.add("hide-labels");
+  });
+
+  renderMapLegend();
+}
+initMap();
+
 </script>
 </body>
 </html>
