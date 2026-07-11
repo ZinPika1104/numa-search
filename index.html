@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="南魚沼市の定番からニッチまで367スポットを検索できる観光アプリ。地図・モデルコース・マイルート・ご当地クイズも。">
+<meta name="description" content="南魚沼市の定番からニッチまで363スポットを検索できる観光アプリ。地図・モデルコース・マイルート・ご当地クイズも。">
 <meta property="og:title" content="ぬまサーチ | 南魚沼おでかけ検索">
-<meta property="og:description" content="定番からニッチまで367スポット。地図・モデルコース・クイズで南魚沼を遊び尽くす。">
+<meta property="og:description" content="定番からニッチまで363スポット。地図・モデルコース・クイズで南魚沼を遊び尽くす。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zinpika1104.github.io/numa-search/">
 <meta property="og:image" content="https://zinpika1104.github.io/numa-search/ogp.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#1f4e5f">
+<meta name="theme-color" content="#218a99">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>ぬまサーチ | 南魚沼市観光ガイド</title>
 <style>
   :root {
-    --indigo: #1f4e5f;
-    --indigo-dark: #14343f;
+    --indigo: #218a99;
+    --indigo-dark: #16616c;
     --accent: #e8734a;
     --snow: #f7f9fa;
     --card: #ffffff;
@@ -29,11 +29,72 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif; background:var(--snow); color:var(--text); line-height:1.65; }
 
-  header { background:linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color:#fff; padding:28px 20px 22px; text-align:center; }
-  header h1 { font-size:1.5rem; letter-spacing:.05em; }
-  header p { font-size:.85rem; opacity:.85; margin-top:4px; }
+  .sitehead { background:#fff; position:sticky; top:0; z-index:40; box-shadow:0 1px 8px rgba(20,52,63,.10); padding:0 16px; }
+  .sitehead-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; min-height:54px; gap:8px 14px; flex-wrap:wrap; padding:6px 0; }
+  .logo { font-size:1.3rem; font-weight:bold; color:var(--indigo); text-decoration:none; letter-spacing:.04em; }
+  .logo span { color:var(--accent); }
+  .gnav { display:flex; gap:2px 15px; flex-wrap:wrap; }
+  .gnav a { font-size:.8rem; color:var(--text); text-decoration:none; padding:4px 1px; border-bottom:2px solid transparent; transition:.15s; }
+  .gnav a:hover { color:var(--indigo); border-bottom-color:var(--indigo); }
 
-  .controls { max-width:960px; margin:-16px auto 0; padding:0 16px; }
+  .hero { position:relative; height:280px; overflow:hidden; background:var(--indigo-dark); }
+  .hero-slide { position:absolute; inset:0; opacity:0; transition:opacity .9s; display:flex; align-items:flex-end; padding:20px 22px 26px; cursor:pointer; }
+  .hero-slide.on { opacity:1; }
+  .hs-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .hs-shade { position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.30),rgba(0,0,0,.08) 45%,rgba(0,0,0,.50)); }
+  .hs-text { position:relative; z-index:1; }
+  .hs-credit { position:absolute; bottom:9px; left:14px; font-size:.62rem; color:rgba(255,255,255,.78); text-decoration:none; z-index:2; }
+  .hs-credit:hover { text-decoration:underline; color:#fff; }
+  .ph-wrap { position:relative; margin:8px 0; }
+  .card-photo { width:100%; height:140px; object-fit:cover; border-radius:10px; display:block; }
+  .dt-photo { width:100%; max-height:260px; object-fit:cover; border-radius:12px; display:block; }
+  .ph-by { position:absolute; right:8px; bottom:8px; font-size:.62rem; color:#fff; background:rgba(0,0,0,.5); padding:2px 8px; border-radius:10px; }
+  .pcard .pthumb { position:relative; overflow:hidden; }
+  .pphoto { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .omiyage { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+  .ocard { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 16px 14px; }
+  .ocard h3 { font-size:.95rem; margin:2px 0 5px; }
+  .ocard p { font-size:.78rem; color:#555; line-height:1.6; margin:0; }
+  .ocard .oprice { margin-top:9px; font-size:.84rem; font-weight:bold; color:var(--accent); }
+  .ocard .oshop { font-size:.7rem; color:#8a97a0; margin-top:3px; }
+  .onote { font-size:.72rem; color:#8a97a0; margin-top:12px; text-align:center; }
+  .markbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .markbtn { border:1px solid var(--line); background:#fff; border-radius:20px; padding:6px 14px; font-size:.8rem; cursor:pointer; transition:.15s; }
+  .markbtn.active { background:var(--indigo); color:#fff; border-color:var(--indigo); }
+  .stats { font-size:.8rem; color:#555; margin-left:auto; }
+  .stats b { color:var(--accent); font-size:.95rem; }
+  .btn-mark { background:#fff; border:1px solid var(--indigo); color:var(--indigo); cursor:pointer; }
+  .bkarea { width:100%; height:88px; font-size:.7rem; border:1px solid var(--line); border-radius:8px; padding:8px; margin:6px 0; font-family:monospace; box-sizing:border-box; }
+  .bkmsg { font-size:.78rem; margin-left:10px; color:var(--indigo); font-weight:bold; }
+  .hero-slide .hs-name { color:#fff; font-size:1.55rem; font-weight:bold; text-shadow:0 2px 10px rgba(0,0,0,.4); line-height:1.3; }
+  .hero-slide .hs-desc { color:#fff; font-size:.82rem; opacity:.92; text-shadow:0 1px 6px rgba(0,0,0,.4); margin-top:3px; max-width:560px; }
+  .hero-copy { position:absolute; top:30px; left:0; right:0; text-align:center; color:#fff; pointer-events:none; text-shadow:0 2px 12px rgba(0,0,0,.4); z-index:2; }
+  .hero-catch { font-size:1.45rem; font-weight:bold; letter-spacing:.1em; }
+  .hero-sub { font-size:.85rem; opacity:.95; margin-top:5px; letter-spacing:.05em; }
+  .hero-dots { position:absolute; bottom:12px; right:16px; display:flex; gap:7px; z-index:3; }
+  .hero-dots button { width:10px; height:10px; border-radius:50%; border:none; background:rgba(255,255,255,.45); cursor:pointer; padding:0; }
+  .hero-dots button.on { background:#fff; }
+
+  .sec { max-width:1100px; margin:38px auto 0; padding:0 16px; }
+  .sec-head { text-align:center; margin-bottom:18px; }
+  .sec-head .en { display:block; font-family:Georgia,"Times New Roman",serif; font-style:italic; color:var(--accent); font-size:1rem; letter-spacing:.08em; }
+  .sec-head h2 { font-size:1.3rem; color:var(--indigo-dark); letter-spacing:.06em; margin-top:2px; }
+  .sec-head h2::after { content:""; display:block; width:38px; height:3px; background:var(--indigo); border-radius:2px; margin:9px auto 0; }
+
+  .pickup { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
+  .pcard { min-width:200px; max-width:200px; flex:0 0 auto; background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; cursor:pointer; transition:.15s; }
+  .pcard:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(20,52,63,.12); }
+  .pcard .pthumb { height:90px; display:flex; align-items:center; justify-content:center; font-size:2.2rem; }
+  .pcard .pbody { padding:10px 12px 12px; }
+  .pcard h3 { font-size:.9rem; line-height:1.4; }
+  .pcard p { font-size:.74rem; color:var(--muted); margin-top:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+  .access { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .acard { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
+  .acard h3 { font-size:1rem; color:var(--indigo); margin-bottom:6px; }
+  .acard p { font-size:.85rem; }
+
+  .controls { max-width:960px; margin:0 auto; padding:0; }
   .search-box { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 14px; display:flex; gap:8px; align-items:center; box-shadow:0 2px 10px rgba(20,52,63,.08); }
   .search-box input { flex:1; border:none; outline:none; font-size:1rem; background:transparent; }
   .chips { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px; }
@@ -44,7 +105,7 @@
   .dist { font-size:.74rem; color:var(--accent); font-weight:bold; margin-top:2px; }
   .count { font-size:.8rem; color:var(--muted); margin:6px 2px; }
 
-  .grid { max-width:960px; margin:8px auto 40px; padding:0 16px; display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:14px; }
+  .grid { max-width:960px; margin:14px auto 8px; padding:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:14px; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; cursor:pointer; transition:.15s; display:flex; flex-direction:column; gap:8px; }
   .card:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(20,52,63,.12); }
   .badge { display:inline-block; font-size:.72rem; padding:2px 10px; border-radius:999px; color:#fff; }
@@ -107,7 +168,7 @@
 
   /* モデルコース */
   .courses-title { max-width:960px; margin:20px auto 0; padding:0 16px; font-size:1rem; color:var(--indigo-dark); }
-  .courses { max-width:960px; margin:10px auto 2px; padding:0 16px 6px; display:flex; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .courses { max-width:1100px; margin:0 auto; padding:0 0 6px; display:flex; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .ccard { min-width:235px; max-width:235px; flex:0 0 auto; background:var(--card); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; cursor:pointer; transition:.15s; }
   .ccard:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(20,52,63,.12); }
   .ccard h3 { font-size:.95rem; margin-bottom:4px; }
@@ -118,11 +179,10 @@
   .cnum { flex:0 0 auto; width:24px; height:24px; border-radius:50%; background:var(--indigo); color:#fff; font-size:.78rem; display:flex; align-items:center; justify-content:center; margin-top:2px; }
   .cleg { font-size:.72rem; color:var(--muted); padding:2px 0 2px 40px; }
 
-  .g-心霊 { background:#37474f; }
 
   /* 四季 */
   .seasons-title { max-width:1100px; margin:26px auto 0; padding:0 16px; font-size:1.05rem; color:var(--indigo); }
-  .seasons { max-width:1100px; margin:12px auto 0; padding:0 16px; display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
+  .seasons { max-width:1100px; margin:0 auto; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
   .scard { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
   .sphoto { height:110px; display:flex; align-items:center; justify-content:center; font-size:2.6rem; color:#fff; }
   .sphoto img { width:100%; height:100%; object-fit:cover; }
@@ -137,7 +197,7 @@
   .sp-冬 { background:linear-gradient(135deg,#8fb8d8,#e8eef2); }
 
   /* クイズ */
-  .quizbar { max-width:1100px; margin:22px auto 0; padding:0 16px; display:flex; gap:10px; flex-wrap:wrap; }
+  .quizbar { max-width:1100px; margin:0 auto; padding:0; display:flex; gap:10px; flex-wrap:wrap; }
   .quizbar .quizbtn { flex:1 1 260px; width:auto; }
   .quizbtn.hard { background:linear-gradient(135deg,#6e2413,var(--accent)); }
   .quizbtn { width:100%; border:none; border-radius:14px; padding:14px; font-size:1rem; cursor:pointer;
@@ -153,7 +213,13 @@
   .qz-prog { font-size:.75rem; color:var(--muted); margin-bottom:8px; }
   .warnbox { background:#fdf3e4; border:1px solid #e0c48a; border-radius:10px; padding:10px 14px; font-size:.8rem; color:#7a5c1e; margin:12px 0; }
 
-  footer { text-align:center; font-size:.75rem; color:var(--muted); padding:20px 16px 36px; }
+  footer.sitefoot { margin-top:48px; background:var(--indigo-dark); color:#cfe3e8; padding:30px 16px 38px; font-size:.75rem; }
+  .sitefoot-inner { max-width:1100px; margin:0 auto; text-align:center; }
+  .sitefoot .flogo { font-size:1.15rem; font-weight:bold; color:#fff; letter-spacing:.05em; margin-bottom:6px; }
+  .sitefoot .fnav { display:flex; justify-content:center; flex-wrap:wrap; gap:4px 16px; margin:10px 0 14px; }
+  .sitefoot .fnav a { color:#fff; text-decoration:none; font-size:.78rem; opacity:.9; }
+  .sitefoot .fnav a:hover { text-decoration:underline; }
+  .sitefoot .fnote { opacity:.75; line-height:1.8; }
   @media (max-width:520px){ .info{grid-template-columns:1fr;} .info dt{margin-top:6px;} }
 </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -162,7 +228,7 @@
   <style>
   /* ぬまマップ */
   .map-title { max-width:1100px; margin:26px auto 0; padding:0 16px; font-size:1.05rem; color:var(--indigo); }
-  .mapwrap { max-width:1100px; margin:10px auto 0; padding:0 16px; }
+  .mapwrap { max-width:1100px; margin:0 auto; padding:0; }
   #map { height:440px; border-radius:14px; border:1px solid var(--line); z-index:1; }
   .maplegend { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
   .lg-chip { display:inline-flex; align-items:center; gap:5px; border:1px solid var(--line); background:#fff; border-radius:999px; padding:4px 11px; font-size:.78rem; cursor:pointer; transition:.15s; }
@@ -178,38 +244,102 @@
 </head>
 <body>
 
-<header>
-  <h1>ぬまサーチ</h1>
-  <p>一つ選ぶと、旅程が広がる。— 南魚沼市の定番からニッチまで</p>
+<header class="sitehead">
+  <div class="sitehead-inner">
+    <a class="logo" href="#">ぬま<span>サーチ</span></a>
+    <nav class="gnav">
+      <a href="#search">スポット検索</a>
+      <a href="#numamap">マップ</a>
+      <a href="#courses-sec">モデルコース</a>
+      <a href="#seasons-sec">四季</a>
+      <a href="#quiz-sec">クイズ</a>
+      <a href="#souvenir-sec">お土産</a>
+      <a href="#access">アクセス</a>
+    </nav>
+  </div>
 </header>
 
-<div class="controls">
-  <div class="search-box">🔍 <input id="q" type="text" placeholder="キーワード検索(例: 雲海、へぎそば、カタクリ)"></div>
-  <button class="nearbtn" id="nearbtn">📍 現在地から近い順に並べる</button>
-  <div class="chips" id="chips"></div>
-  <div class="count" id="count"></div>
+<div class="hero" id="hero">
+  <div class="hero-slides" id="heroslides"></div>
+  <div class="hero-copy">
+    <p class="hero-catch">一つ選ぶと、旅程が広がる。</p>
+    <p class="hero-sub">南魚沼市の定番からニッチまで 363スポット</p>
+  </div>
+  <div class="hero-dots" id="herodots"></div>
 </div>
 
+<section class="sec" id="pickup-sec">
+  <div class="sec-head"><span class="en">Pick up!</span><h2>いま推したいスポット</h2></div>
+  <div class="pickup" id="pickup"></div>
+</section>
 
-<h2 class="seasons-title">🍃 南魚沼の四季</h2>
-<div class="seasons" id="seasons"></div>
+<section class="sec" id="search">
+  <div class="sec-head"><span class="en">Search</span><h2>スポットをさがす</h2></div>
+  <div class="controls">
+    <div class="search-box">🔍 <input id="q" type="text" placeholder="キーワード検索(例: 雲海、へぎそば、カタクリ)"></div>
+    <button class="nearbtn" id="nearbtn">📍 現在地から近い順に並べる</button>
+    <div class="markbar">
+      <button class="markbtn" id="bmfilter">⭐ ブックマーク</button>
+      <button class="markbtn" id="vzfilter">✅ 行った済</button>
+      <button class="markbtn" id="bkbtn">💾 記録の保存/復元</button>
+      <span class="stats" id="stats"></span>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="count" id="count"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
 
-<div class="quizbar">
-  <button class="quizbtn" id="quizstart">🧠 ぬまクイズに挑戦！ — ご当地クイズ全10問</button>
-  <button class="quizbtn hard" id="quizstart2">🔥 マニア級ぬまクイズ — 難問全10問</button>
-</div>
+<section class="sec" id="numamap">
+  <div class="sec-head"><span class="en">Map</span><h2>ぬまマップ — 全スポットを地図で見る</h2></div>
+  <div class="mapwrap">
+    <div class="maplegend" id="maplegend"></div>
+    <div id="map" class="hide-labels"></div>
+    <div class="map-note">凡例タップでジャンルの表示切替 / ズームすると名前が表示されます / ピンをタップ→「詳細を見る」でスポット情報。座標は近似値です。</div>
+  </div>
+</section>
 
-<h2 class="map-title">📍 ぬまマップ — 全スポットを地図で見る</h2>
-<div class="mapwrap">
-  <div class="maplegend" id="maplegend"></div>
-  <div id="map" class="hide-labels"></div>
-  <div class="map-note">凡例タップでジャンルの表示切替 / ズームすると名前が表示されます / ピンをタップ→「詳細を見る」でスポット情報。座標は近似値です。</div>
-</div>
+<section class="sec" id="courses-sec">
+  <div class="sec-head"><span class="en">Model Course</span><h2>おすすめモデルコース</h2></div>
+  <div class="courses" id="courses"></div>
+</section>
 
-<h2 class="courses-title">🗺 おすすめモデルコース</h2>
-<div class="courses" id="courses"></div>
+<section class="sec" id="seasons-sec">
+  <div class="sec-head"><span class="en">Seasons</span><h2>南魚沼の四季</h2></div>
+  <div class="seasons" id="seasons"></div>
+</section>
 
-<div class="grid" id="grid"></div>
+<section class="sec" id="quiz-sec">
+  <div class="sec-head"><span class="en">Quiz</span><h2>ぬまクイズ</h2></div>
+  <div class="quizbar">
+    <button class="quizbtn" id="quizstart">🧠 ぬまクイズに挑戦！ — ご当地クイズ全10問</button>
+    <button class="quizbtn hard" id="quizstart2">🔥 マニア級ぬまクイズ — 難問全10問</button>
+  </div>
+</section>
+
+<section class="sec" id="souvenir-sec">
+  <div class="sec-head"><span class="en">Souvenir</span><h2>おすすめお土産</h2></div>
+  <div class="omiyage">
+    <div class="ocard"><h3>🌾 南魚沼産コシヒカリ</h3><p>言わずと知れた日本トップブランド米。雪解け水と昼夜の寒暖差が育む粘りと甘み。贈答用の小袋も豊富。</p><div class="oprice">参考: 精米2kg 約1,700円</div><div class="oshop">JAみなみ魚沼直売所/道の駅「四季味わい館」ほか</div></div>
+    <div class="ocard"><h3>🥤 八海山 麹だけでつくったあまさけ</h3><p>砂糖不使用・麹の甘みだけの上品なあまさけ。機能性表示食品にもなった定番土産。</p><div class="oprice">参考: 825g 864円</div><div class="oshop">魚沼の里/市内酒店・スーパー</div></div>
+    <div class="ocard"><h3>🍶 鶴齢(かくれい) 純米吟醸</h3><p>1717年創業・塩沢の青木酒造の看板酒。淡麗辛口が多い新潟では珍しい、米の旨みを残した旨口タイプ。</p><div class="oprice">参考: 720ml 約2,000円</div><div class="oshop">牧之通り周辺・市内酒店</div></div>
+    <div class="ocard"><h3>🍶 八海山(日本酒)</h3><p>南魚沼を代表する銘酒。定番の清酒から純米大吟醸まで幅広く、小瓶の飲み比べも人気。</p><div class="oprice">参考: 720ml 1,200円台〜</div><div class="oshop">魚沼の里/市内酒店</div></div>
+    <div class="ocard"><h3>🍡 笹だんご</h3><p>よもぎ餅とあんこを笹の葉で包んだ新潟銘菓。米どころ南魚沼の餅はコシが違う。</p><div class="oprice">参考: 10個 約1,300〜1,700円</div><div class="oshop">おかしとおやき ことう/道の駅ほか</div></div>
+    <div class="ocard"><h3>🍰 さとやバウム・八海棒夢</h3><p>八海山の酒粕・大吟醸を使ったしっとりバウムクーヘン。魚沼の里の人気土産。</p><div class="oprice">参考: 小 1,000円前後</div><div class="oshop">魚沼の里「菓子処 さとや」</div></div>
+    <div class="ocard"><h3>🍉 八色スイカ(夏限定)</h3><p>大和・八色原の砂質土壌が生むシャリ感と高い糖度。7〜8月だけの季節土産。</p><div class="oprice">参考: 1玉 2,000〜3,000円台</div><div class="oshop">八色原・JAの直売所</div></div>
+    <div class="ocard"><h3>🍄 雪国まいたけ・八色しいたけ</h3><p>南魚沼が誇るきのこブランド。肉厚な八色しいたけは焼くだけでご馳走に。</p><div class="oprice">参考: 数百円〜</div><div class="oshop">直売所/市内スーパー</div></div>
+  </div>
+  <div class="onote">※価格は税込の参考目安です。時期・店舗により変わります。</div>
+</section>
+
+<section class="sec" id="access">
+  <div class="sec-head"><span class="en">Access</span><h2>南魚沼へのアクセス</h2></div>
+  <div class="access">
+    <div class="acard"><h3>🚄 新幹線で</h3><p>東京駅 → 上越新幹線で約1時間30分 → 浦佐駅。六日町方面へはJR上越線に乗り換え約15分。</p></div>
+    <div class="acard"><h3>🚗 車で</h3><p>関越自動車道「六日町IC」「塩沢石打IC」「大和スマートIC」下車。都心から約2時間30分。冬はスタッドレス必須。</p></div>
+    <div class="acard"><h3>🚃 在来線で</h3><p>JR上越線・ほくほく線が市内を縦断。中心駅は六日町駅。越後湯沢駅から約20分。</p></div>
+  </div>
+</section>
 
 <div class="overlay" id="overlay">
   <div class="modal" id="modal"></div>
@@ -228,9 +358,22 @@
   </div>
 </div>
 
-<footer>
-  営業時間・料金は変わることがあります。お出かけ前に公式情報をご確認ください。<br>
-  座標は周辺提案・所要時間の目安計算用の近似値です。データはこのHTML内のSPOTS配列を編集して追加・修正できます。
+<footer class="sitefoot">
+  <div class="sitefoot-inner">
+    <div class="flogo">ぬまサーチ</div>
+    <div>新潟県南魚沼市の観光スポット検索アプリ — 定番からニッチまで363スポット</div>
+    <nav class="fnav">
+      <a href="#search">スポット検索</a>
+      <a href="#numamap">マップ</a>
+      <a href="#courses-sec">モデルコース</a>
+      <a href="#seasons-sec">四季</a>
+      <a href="#quiz-sec">クイズ</a>
+      <a href="#souvenir-sec">お土産</a>
+      <a href="#access">アクセス</a>
+    </nav>
+    <div class="fnote">営業時間・料金は変わることがあります。お出かけ前に公式情報をご確認ください。<br>
+    座標は周辺提案・所要時間の目安計算用の近似値です。データはHTML内のSPOTS配列で編集できます。</div>
+  </div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -1438,27 +1581,6 @@ const SPOTS = [
   { id:"ov126", name:"ペンション カム", genre:"宿泊", area:"六日町", desc:"八海山麓のペンション。", niche:"", address:"南魚沼市(六日町地域)", lat:37.06, lng:138.882, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["ペンション","八海山","公式サイト掲載"] },
   { id:"ov127", name:"旅館いろは亭", genre:"宿泊", area:"六日町", desc:"五日町スキー場周辺の旅館。田植え選手権など特色ある農業体験イベントも。", niche:"", address:"南魚沼市(六日町地域)", lat:37.055, lng:138.872, hours:"要確認", price:"-", parking:"要確認", season:"通年", tags:["五日町","農業体験","公式サイト掲載"] },
 
- /* ---- 心霊スポット(夜間の訪問・立入禁止区域への侵入は絶対にしないこと) ---- */
- { id:"gh1", name:"わらび野トンネル", genre:"心霊", area:"六日町",
-   desc:"三国川ダム方面の旧道にあるトンネル。県内でも有名な心霊スポットとされ、「抜けられなくなるループ現象」や車窓に手形が浮かぶ等の噂が語られる。",
-   niche:"2000年に実際の事件が起きた場所でもあるため、興味本位の肝試しは控え、訪れる場合は日中に。冬季は積雪で接近困難。",
-   address:"南魚沼市(三国川ダム周辺)", lat:37.045, lng:138.945,
-   hours:"-", price:"-", parking:"なし", season:"夏(無雪期のみ)", tags:["心霊","トンネル","旧道","注意"] },
- { id:"gh2", name:"三国川ダム周辺トンネル群", genre:"心霊", area:"六日町",
-   desc:"しゃくなげ湖(三国川ダム)へ向かう道中に連続するトンネル群。夜間に人影を見た等の噂があり、県内の心霊スポットまとめで度々名前が挙がる。",
-   niche:"昼間はダム見学や十字峡観光で普通に通る道。夜間は照明が少なく道幅も狭いので運転自体が危険。",
-   address:"南魚沼市清水瀬(三国川ダム)", lat:37.036, lng:138.960,
-   hours:"-", price:"-", parking:"ダム周辺にあり", season:"夏(無雪期のみ)", tags:["心霊","ダム","トンネル"] },
- { id:"gh3", name:"柳澤隧道", genre:"心霊", area:"六日町",
-   desc:"小栗山地区にある手掘りの古い隧道。岩肌むき出しの不気味な雰囲気で、心霊体験の噂が語られるスポット。",
-   niche:"土木遺産的な観点では手掘り隧道として貴重。崩落の危険があるため内部への立ち入りは自己責任では済まない。外観見学まで。",
-   address:"南魚沼市小栗山", lat:37.070, lng:138.930,
-   hours:"-", price:"-", parking:"なし", season:"夏(無雪期のみ)", tags:["心霊","隧道","手掘り","廃道"] },
- { id:"gh4", name:"八箇峠(旧道)", genre:"心霊", area:"六日町",
-   desc:"六日町と十日町を結ぶ八箇峠の旧道区間。夜間の峠道として不気味な噂が語られてきた。現在は八箇峠トンネル開通で旧道はほぼ使われない。",
-   niche:"旧道は管理されておらず崩落・落石リスクあり。新トンネル経由なら十日町方面への近道として普通に便利。",
-   address:"南魚沼市野田(八箇峠)", lat:37.075, lng:138.800,
-   hours:"-", price:"-", parking:"なし", season:"夏(無雪期のみ)", tags:["心霊","峠","旧道"] },
 
 ];
 
@@ -1508,7 +1630,7 @@ const COURSES = [
    spots:["ishiuchi-maruyama","higuma-shiozawa","muikamachi-onsen"] },
 ];
 
-const GENRES = ["すべて","観光","自然","飲食","カフェ","温泉","宿泊","買物","心霊"];
+const GENRES = ["すべて","観光","自然","飲食","カフェ","温泉","宿泊","買物"];
 let activeGenre = "すべて";
 let keyword = "";
 
@@ -1541,6 +1663,8 @@ function distKm(a, b){
 function driveMin(km){ return Math.max(1, Math.round(km * 1.3 / 30 * 60)); }
 
 function matches(s){
+  if (markFilter === "bm" && !bmSet.includes(s.id)) return false;
+  if (markFilter === "vz" && !vzSet.includes(s.id)) return false;
   if (activeGenre !== "すべて" && s.genre !== activeGenre) return false;
   if (!keyword) return true;
   const hay = [s.name, s.desc, s.niche, s.area, s.address, s.season, ...(s.tags||[])].join(" ").toLowerCase();
@@ -1553,6 +1677,104 @@ function renderChips(){
   $chips.querySelectorAll(".chip").forEach(b => b.onclick = () => { activeGenre = b.dataset.g; render(); });
 }
 
+/* ============ スポット写真 ============
+   ★写真の追加方法★
+   1) GitHubリポジトリに「photos」フォルダを作成
+   2) 「スポットID.jpg」という名前で写真をアップロード(例: photos/sakadoyama.jpg)
+   3) 下のPHOTOSに1行追加。撮影者名を書くと「📷 撮影: 名前」と表示(空欄""なら名前非表示)
+      例)
+      const PHOTOS = {
+        sakadoyama: "ゆうき",
+        untouan: "",
+      };
+   スポットIDは同梱の「写真ID一覧.md」かSPOTS配列のidを参照 */
+const PHOTOS = {
+};
+function spotPhoto(id){ return PHOTOS.hasOwnProperty(id) ? "photos/" + encodeURIComponent(id) + ".jpg" : null; }
+function photoByHtml(id){ return PHOTOS[id] ? `<span class="ph-by">📷 撮影: ${esc(PHOTOS[id])}</span>` : ""; }
+function imgFallback(el){
+  const alts = (el.dataset.alt || "").split("|").filter(Boolean);
+  if (alts.length){ el.dataset.alt = alts.slice(1).join("|"); el.src = alts[0]; return; }
+  const w = el.parentNode;
+  if (w){ const c = w.querySelector(".hs-credit"); if (c) c.remove(); const sh = w.querySelector(".hs-shade"); if (sh) sh.remove(); }
+  el.remove();
+}
+function heroCredit(el){
+  const a = el.parentNode && el.parentNode.querySelector(".hs-credit");
+  if (!a) return;
+  if (el.src.indexOf("wikimedia.org") !== -1){
+    const hp = HERO_PHOTO[el.dataset.id];
+    a.textContent = "📷 Wikimedia Commons";
+    if (hp) a.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(hp.file);
+    a.style.display = "";
+  } else {
+    const by = PHOTOS[el.dataset.id];
+    if (by){ a.textContent = "📷 撮影: " + by; a.removeAttribute("href"); a.style.display = ""; }
+    else a.remove();
+  }
+}
+
+/* ============ ブックマーク & 行った済(制覇率) ============ */
+let bmSet = [], vzSet = [], markFilter = "";
+try { bmSet = JSON.parse(localStorage.getItem("numaBm") || "[]"); } catch(e){}
+try { vzSet = JSON.parse(localStorage.getItem("numaVisited") || "[]"); } catch(e){}
+function saveMarks(){ try { localStorage.setItem("numaBm", JSON.stringify(bmSet)); localStorage.setItem("numaVisited", JSON.stringify(vzSet)); } catch(e){} }
+function toggleMark(arr, id){ const i = arr.indexOf(id); if (i === -1) arr.push(id); else arr.splice(i, 1); saveMarks(); renderStats(); }
+function renderStats(){
+  const el = document.getElementById("stats");
+  if (!el) return;
+  const n = vzSet.filter(id => SPOTS.some(s => s.id === id)).length;
+  el.innerHTML = `🏆 制覇率 <b>${Math.round(n / SPOTS.length * 100)}%</b>(${n}/${SPOTS.length})`;
+}
+(function(){
+  const bb = document.getElementById("bmfilter"), vb = document.getElementById("vzfilter");
+  if (!bb || !vb) return;
+  const kb = document.getElementById("bkbtn");
+  if (kb) kb.onclick = backupOpen;
+  bb.onclick = () => { markFilter = markFilter === "bm" ? "" : "bm"; bb.classList.toggle("active", markFilter === "bm"); vb.classList.remove("active"); render(); };
+  vb.onclick = () => { markFilter = markFilter === "vz" ? "" : "vz"; vb.classList.toggle("active", markFilter === "vz"); bb.classList.remove("active"); render(); };
+})();
+renderStats();
+
+/* ============ 記録のバックアップ/復元 ============ */
+function backupOpen(){
+  const data = JSON.stringify({ v:1, bm:bmSet, vz:vzSet, plan:plan });
+  $modal.innerHTML = `
+    <button class="close" id="mclose">✕</button>
+    <h2>💾 記録の保存・復元</h2>
+    <p class="sub">ブックマーク・行った済・マイルートをまとめて書き出し/復元できます。機種変更の引き継ぎにも。</p>
+    <h3 class="nearby-title">保存(書き出し)</h3>
+    <p class="desc" style="font-size:.8rem;margin:0">下のコードをコピーして、LINEのKeepメモやメモアプリに保存してください。</p>
+    <textarea class="bkarea" id="bkout" readonly>${data}</textarea>
+    <button class="btn-sm" id="bkcopy">📋 コードをコピー</button><span class="bkmsg" id="bkmsg1"></span>
+    <h3 class="nearby-title">復元(読み込み)</h3>
+    <p class="desc" style="font-size:.8rem;margin:0">保存しておいたコードを下に貼り付けて「復元する」を押してください。</p>
+    <textarea class="bkarea" id="bkin" placeholder='{"v":1,"bm":[...],...}'></textarea>
+    <button class="btn-sm" id="bkrestore">♻️ 復元する</button><span class="bkmsg" id="bkmsg2"></span>`;
+  $overlay.classList.add("open");
+  document.getElementById("mclose").onclick = closeDetail;
+  document.getElementById("bkcopy").onclick = () => {
+    const ta = document.getElementById("bkout");
+    ta.select(); ta.setSelectionRange(0, 999999);
+    const done = () => { document.getElementById("bkmsg1").textContent = "コピーしました！"; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done).catch(() => { document.execCommand("copy"); done(); });
+    else { document.execCommand("copy"); done(); }
+  };
+  document.getElementById("bkrestore").onclick = () => {
+    const msg = document.getElementById("bkmsg2");
+    try {
+      const d = JSON.parse(document.getElementById("bkin").value.trim());
+      const ok = id => SPOTS.some(s => s.id === id);
+      if (!d || (!Array.isArray(d.bm) && !Array.isArray(d.vz) && !Array.isArray(d.plan))) throw 0;
+      if (Array.isArray(d.bm)) bmSet = d.bm.filter(ok);
+      if (Array.isArray(d.vz)) vzSet = d.vz.filter(ok);
+      if (Array.isArray(d.plan)){ plan = d.plan.filter(ok); savePlan(); renderRoute(); }
+      saveMarks(); renderStats(); render();
+      msg.textContent = `復元しました！(⭐${bmSet.length}件・✅${vzSet.length}件・ルート${plan.length}件)`;
+    } catch(e){ msg.textContent = "コードが正しくないみたい。全部コピーできているか確認してね。"; }
+  };
+}
+
 function render(){
   renderChips();
   let list = SPOTS.filter(matches);
@@ -1560,8 +1782,9 @@ function render(){
   $count.textContent = `${list.length}件のスポット` + (nearSort && userPos ? "(現在地から近い順)" : "");
   $grid.innerHTML = list.map(s => `
     <div class="card" data-id="${s.id}">
+      ${spotPhoto(s.id) ? `<div class="ph-wrap"><img class="card-photo" src="${spotPhoto(s.id)}" alt="" loading="lazy" onerror="this.parentNode.remove()">${photoByHtml(s.id)}</div>` : ""}
       <div><span class="badge g-${s.genre}">${s.genre}</span><span class="area"> ${esc(s.area)}エリア</span></div>
-      <h3>${esc(s.name)}</h3>
+      <h3>${esc(s.name)}${bmSet.includes(s.id) ? " ⭐" : ""}${vzSet.includes(s.id) ? " ✅" : ""}</h3>
       ${nearSort && userPos ? `<div class="dist">📍 ${distKm(userPos,s).toFixed(1)}km・車で約${driveMin(distKm(userPos,s))}分</div>` : ""}
       <p>${esc(s.desc)}</p>
       <div class="tags">${(s.tags||[]).map(t=>"#"+esc(t)).join(" ")}</div>
@@ -1588,8 +1811,9 @@ function openDetail(id){
     <span class="badge g-${s.genre}">${s.genre}</span><span class="sub"> ${esc(s.area)}エリア</span>
     <h2>${esc(s.name)}</h2>
     <p class="sub">${esc(s.address)}</p>
+    ${spotPhoto(id) ? `<div class="ph-wrap"><img class="dt-photo" src="${spotPhoto(id)}" alt="" onerror="this.parentNode.remove()">${photoByHtml(id)}</div>` : ""}
     <p class="desc">${esc(s.desc)}</p>
-    ${s.niche ? `<div class="niche"><b>💡 ニッチ情報・穴場メモ</b>${esc(s.niche)}</div>` : ""}${s.genre === "心霊" ? `<div class="warnbox">⚠️ 心霊スポットはあくまで「噂」の紹介です。夜間の訪問、立入禁止区域・廃道への侵入、近隣への迷惑行為は絶対にやめましょう。</div>` : ""}
+    ${s.niche ? `<div class="niche"><b>💡 ニッチ情報・穴場メモ</b>${esc(s.niche)}</div>` : ""}
     <dl class="info">
       <dt>営業時間</dt><dd>${esc(s.hours)}</dd>
       <dt>料金</dt><dd>${esc(s.price)}</dd>
@@ -1600,6 +1824,8 @@ function openDetail(id){
       <a class="btn btn-map" href="${mapPlaceUrl(s)}" target="_blank" rel="noopener">📍 Googleマップで開く</a>
       <a class="btn btn-route" href="${mapRouteUrl(null, s)}" target="_blank" rel="noopener">🚗 現在地からのルート</a>
       <button class="btn btn-add" id="madd">${plan.includes(s.id) ? "✓ ルート追加済み" : "➕ ルートに追加"}</button>
+      <button class="btn btn-mark" id="mbm">${bmSet.includes(s.id) ? "⭐ ブックマーク済" : "☆ ブックマーク"}</button>
+      <button class="btn btn-mark" id="mvz">${vzSet.includes(s.id) ? "✅ 行った！" : "⬜ まだ行ってない"}</button>
     </div>
     <h3 class="nearby-title">🧭 おすすめの組み合わせ(近くのジャンル違い)</h3>
     <div class="nearby">
@@ -1636,6 +1862,16 @@ function openDetail(id){
   });
   document.getElementById("madd").onclick = () => {
     addToPlan(s.id); document.getElementById("madd").textContent = "✓ ルート追加済み";
+  };
+  document.getElementById("mbm").onclick = () => {
+    toggleMark(bmSet, s.id);
+    document.getElementById("mbm").textContent = bmSet.includes(s.id) ? "⭐ ブックマーク済" : "☆ ブックマーク";
+    render();
+  };
+  document.getElementById("mvz").onclick = () => {
+    toggleMark(vzSet, s.id);
+    document.getElementById("mvz").textContent = vzSet.includes(s.id) ? "✅ 行った！" : "⬜ まだ行ってない";
+    render();
   };
   document.getElementById("maddall").onclick = () => {
     addToPlan(s.id); suggest.forEach(n => addToPlan(n.spot.id)); openDetail(id);
@@ -1928,7 +2164,7 @@ renderCourses();
 renderRoute();
 
 /* ============ ぬまマップ(ジャンル色分けピン・クラスター表示) ============ */
-const GENRE_COLORS = { "観光":"#e8a33d","自然":"#4c9a58","飲食":"#d95f43","カフェ":"#a9713a","温泉":"#3f7fb5","宿泊":"#7b5ea7","買物":"#5f7d8c","心霊":"#454c55" };
+const GENRE_COLORS = { "観光":"#e8a33d","自然":"#4c9a58","飲食":"#d95f43","カフェ":"#a9713a","温泉":"#3f7fb5","宿泊":"#7b5ea7","買物":"#5f7d8c" };
 let numaMap = null, mapCluster = null;
 const mapMarkers = {};
 const mapLegendState = {};
@@ -2006,6 +2242,74 @@ $nearbtn.onclick = () => {
 if ("serviceWorker" in navigator && typeof location !== "undefined" && location.protocol === "https:"){
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
+
+/* ============ ヒーロースライダー & Pick up!(v5 UI) ============ */
+const HERO_IDS = ["sakadoyama","untouan","makihatayama","bishamondo","ov57"];
+/* Wikimedia Commons の写真(直リンク。読み込み失敗時はグラデーションに自動フォールバック) */
+const HERO_PHOTO = {
+  makihatayama: { file:"巻機山.JPG", urls:[
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/%E5%B7%BB%E6%A9%9F%E5%B1%B1.JPG/1280px-%E5%B7%BB%E6%A9%9F%E5%B1%B1.JPG",
+    "https://upload.wikimedia.org/wikipedia/commons/a/ac/%E5%B7%BB%E6%A9%9F%E5%B1%B1.JPG" ] },
+  ov57: { file:"Mt.Hakkai_01.jpg", urls:[
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mt.Hakkai_01.jpg/1280px-Mt.Hakkai_01.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/5/5b/Mt.Hakkai_01.jpg" ] },
+  sakadoyama: { file:"Sakado_Castle_site.jpg", urls:[
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Sakado_Castle_site.jpg/1280px-Sakado_Castle_site.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/6/6b/Sakado_Castle_site.jpg" ] }
+};
+const HERO_GRAD = {
+  "観光":"linear-gradient(150deg,#5d3f80,#9b72c0)", "自然":"linear-gradient(150deg,#1e6b45,#67b98d)",
+  "宿泊":"linear-gradient(150deg,#39448f,#7986cb)", "温泉":"linear-gradient(150deg,#2b5c8f,#6fa3d4)",
+  "飲食":"linear-gradient(150deg,#b34e28,#e8734a)", "カフェ":"linear-gradient(150deg,#9a6f22,#c9973a)",
+  "買物":"linear-gradient(150deg,#833f5b,#ad5f7d)"
+};
+var heroCur = 0;
+function heroGo(i){
+  const $hs = document.getElementById("heroslides"), $hd = document.getElementById("herodots");
+  heroCur = i;
+  Array.prototype.forEach.call($hs.children, (el,j) => el.classList.toggle("on", j===i));
+  Array.prototype.forEach.call($hd.children, (el,j) => el.classList.toggle("on", j===i));
+}
+(function(){
+  const $hs = document.getElementById("heroslides"), $hd = document.getElementById("herodots");
+  if (!$hs) return;
+  const items = HERO_IDS.map(id => SPOTS.find(s => s.id === id)).filter(Boolean);
+  items.forEach((s,i) => {
+    const d = document.createElement("div");
+    d.className = "hero-slide" + (i===0 ? " on" : "");
+    d.style.background = HERO_GRAD[s.genre] || "linear-gradient(150deg,#16616c,#218a99)";
+    const cand = [];
+    if (PHOTOS.hasOwnProperty(s.id)) cand.push(spotPhoto(s.id));
+    const hp = HERO_PHOTO[s.id];
+    if (hp) cand.push.apply(cand, hp.urls);
+    const photoHtml = cand.length
+      ? `<img class="hs-photo" src="${cand[0]}" data-alt="${cand.slice(1).join("|")}" data-id="${s.id}" alt="" loading="${i===0?'eager':'lazy'}" onerror="imgFallback(this)" onload="heroCredit(this)"><div class="hs-shade"></div><a class="hs-credit" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:none"></a>`
+      : "";
+    d.innerHTML = photoHtml + `<div class="hs-text"><div class="hs-name">${esc(s.name)}</div><div class="hs-desc">${esc((s.desc||"").slice(0,46))}…</div></div>`;
+    d.onclick = () => openDetail(s.id);
+    $hs.appendChild(d);
+    const b = document.createElement("button");
+    if (i===0) b.className = "on";
+    b.onclick = (e) => { e.stopPropagation(); heroGo(i); };
+    $hd.appendChild(b);
+  });
+  if (items.length > 1) setInterval(() => heroGo((heroCur+1) % items.length), 5000);
+})();
+
+/* Pick up! カード */
+const PICKUP_IDS = ["tabataya","yukiakari","satoya","sucre","sanaburi","keyakien","shikiajiwaikan","kankouji"];
+(function(){
+  const $p = document.getElementById("pickup");
+  if (!$p) return;
+  const EMOJI = { "観光":"⛩️", "自然":"🏔️", "飲食":"🍜", "カフェ":"☕", "温泉":"♨️", "宿泊":"🏠", "買物":"🛍️" };
+  PICKUP_IDS.map(id => SPOTS.find(s => s.id === id)).filter(Boolean).forEach(s => {
+    const d = document.createElement("div");
+    d.className = "pcard";
+    d.innerHTML = `<div class="pthumb g-${s.genre}">${spotPhoto(s.id) ? `<img class="pphoto" src="${spotPhoto(s.id)}" alt="" loading="lazy" onerror="this.remove()">` : ""}${EMOJI[s.genre]||"📍"}</div><div class="pbody"><h3>${esc(s.name)}</h3><p>${esc(s.desc||"")}</p></div>`;
+    d.onclick = () => openDetail(s.id);
+    $p.appendChild(d);
+  });
+})();
 
 
 </script>
