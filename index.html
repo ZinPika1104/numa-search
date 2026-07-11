@@ -1791,8 +1791,8 @@ function backupOpen(){
 /* ============ みんなのコメント(Firebase) ============
    「コメント設定手順.md」のとおりFirebaseプロジェクトを作って、下の2つを貼り替えると
    全スポットの詳細画面にコメント欄が現れます(空のままなら非表示) */
-const FB_PROJECT_ID = "";  // 例: "numa-search-12345"
-const FB_API_KEY = "";     // 例: "AIzaSy..."
+const FB_PROJECT_ID = "";  // "numa-search-104b4",
+const FB_API_KEY = "";     // "AIzaSyBOubu7a2pCiCGl_sbteqNnQcBpC5rHB_Q",
 
 function fbBase(){ return "https://firestore.googleapis.com/v1/projects/" + FB_PROJECT_ID + "/databases/(default)/documents"; }
 function loadComments(id){
