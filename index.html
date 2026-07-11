@@ -1991,10 +1991,7 @@ function loadGmaps(){
 function loadGooglePlaces(s){
   const box = document.getElementById("gplaces");
   if (!box) return;
-  if (!GOOGLE_MAPS_API_KEY){
-    box.innerHTML = `<p class="gp-hint">💡 GoogleマップAPIキーを設定すると、ここに周辺の飲食店が自動表示されます(ファイル内 GOOGLE_MAPS_API_KEY のコメント参照)。</p>`;
-    return;
-  }
+  if (!GOOGLE_MAPS_API_KEY){ box.innerHTML = ""; return; }
   box.innerHTML = `<h3 class="nearby-title">周辺の飲食店(Googleマップ)</h3><p class="gp-hint">読み込み中…</p>`;
   loadGmaps().then(() => {
     const svc = new google.maps.places.PlacesService(document.createElement("div"));
