@@ -25,6 +25,7 @@
     --text: #2b3a42;
     --muted: #7a8a93;
     --line: #e3e9ec;
+    --serif-jp: "Yu Mincho","YuMincho","Hiragino Mincho ProN","Noto Serif JP",serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif; background:var(--snow); color:var(--text); line-height:1.65; }
@@ -88,11 +89,14 @@
   .hero-dots button { width:10px; height:10px; border-radius:50%; border:none; background:rgba(255,255,255,.45); cursor:pointer; padding:0; }
   .hero-dots button.on { background:#fff; }
 
-  .sec { max-width:1100px; margin:38px auto 0; padding:0 16px; }
+  .sec { max-width:1100px; margin:56px auto 0; padding:0 16px; }
   .sec-head { text-align:center; margin-bottom:18px; }
-  .sec-head .en { display:block; font-family:Georgia,"Times New Roman",serif; font-style:italic; color:var(--accent); font-size:1rem; letter-spacing:.08em; }
-  .sec-head h2 { font-size:1.3rem; color:var(--indigo-dark); letter-spacing:.06em; margin-top:2px; }
-  .sec-head h2::after { content:""; display:block; width:38px; height:3px; background:var(--indigo); border-radius:2px; margin:9px auto 0; }
+  .sec-head .en { display:block; font-family:Georgia,"Times New Roman",serif; font-style:italic; color:var(--accent); font-size:.9rem; letter-spacing:.22em; text-transform:uppercase; }
+  .sec-head h2 { font-size:1.4rem; color:var(--indigo-dark); letter-spacing:.05em; margin-top:4px; }
+  .sec-head h2::after { content:""; display:block; width:52px; height:1px; background:var(--indigo); margin:12px auto 0; }
+  .sec-head h2, .modal h2, .card h3, .pcard h3, .acard h3, .ccard h3, .sbody h3, .ocard h3 { font-family:var(--serif-jp); font-weight:600; letter-spacing:.03em; }
+  .ic { width:1em; height:1em; display:inline-block; vertical-align:-.14em; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .pthumb-g { font-family:var(--serif-jp); font-size:1.05rem; color:#fff; letter-spacing:.12em; }
 
   .pickup { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
   .pcard { min-width:200px; max-width:200px; flex:0 0 auto; background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; cursor:pointer; transition:.15s; }
@@ -197,24 +201,24 @@
   .seasons-title { max-width:1100px; margin:26px auto 0; padding:0 16px; font-size:1.05rem; color:var(--indigo); }
   .seasons { max-width:1100px; margin:0 auto; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
   .scard { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
-  .sphoto { height:110px; display:flex; align-items:center; justify-content:center; font-size:2.6rem; color:#fff; }
+  .sphoto { height:110px; display:flex; align-items:center; justify-content:center; font-size:2.6rem; color:var(--indigo-dark); font-family:var(--serif-jp); }
   .sphoto img { width:100%; height:100%; object-fit:cover; }
   .sbody { padding:12px 14px 14px; }
   .sbody h3 { font-size:.95rem; color:var(--indigo); margin-bottom:6px; }
   .sbody ul { list-style:none; font-size:.78rem; color:#4a5a63; }
   .sbody li { padding:2px 0 2px 1.1em; text-indent:-1.1em; }
   .sbody li::before { content:"・"; color:var(--accent); }
-  .sp-春 { background:linear-gradient(135deg,#f8b5c8,#c9e4a5); }
-  .sp-夏 { background:linear-gradient(135deg,#4a9d6e,#7ec8e3); }
-  .sp-秋 { background:linear-gradient(135deg,#e8734a,#c9973a); }
-  .sp-冬 { background:linear-gradient(135deg,#8fb8d8,#e8eef2); }
+  .sp-春 { background:#d8c2cf; }
+  .sp-夏 { background:#bfe0d2; }
+  .sp-秋 { background:#e4c1ad; }
+  .sp-冬 { background:#cdd9e0; }
 
   /* クイズ */
   .quizbar { max-width:1100px; margin:0 auto; padding:0; display:flex; gap:10px; flex-wrap:wrap; }
   .quizbar .quizbtn { flex:1 1 260px; width:auto; }
-  .quizbtn.hard { background:linear-gradient(135deg,#6e2413,var(--accent)); }
+  .quizbtn.hard { background:var(--accent); }
   .quizbtn { width:100%; border:none; border-radius:14px; padding:14px; font-size:1rem; cursor:pointer;
-             background:linear-gradient(135deg,var(--indigo),#2e6b7e); color:#fff; transition:.15s; }
+             background:var(--indigo); color:#fff; transition:.15s; }
   .quizbtn:hover { opacity:.92; }
   .qz-choice { display:block; width:100%; text-align:left; margin:8px 0; padding:10px 14px; border:1px solid var(--line);
                border-radius:10px; background:#fff; font-size:.92rem; cursor:pointer; transition:.15s; }
@@ -289,12 +293,12 @@
 <section class="sec" id="search">
   <div class="sec-head"><span class="en">Search</span><h2>スポットをさがす</h2></div>
   <div class="controls">
-    <div class="search-box">🔍 <input id="q" type="text" placeholder="キーワード検索(例: 雲海、へぎそば、カタクリ)"></div>
-    <button class="nearbtn" id="nearbtn">📍 現在地から近い順に並べる</button>
+    <div class="search-box"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg> <input id="q" type="text" placeholder="キーワード検索(例: 雲海、へぎそば、カタクリ)"></div>
+    <button class="nearbtn" id="nearbtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> 現在地から近い順に並べる</button>
     <div class="markbar">
-      <button class="markbtn" id="bmfilter">⭐ ブックマーク</button>
-      <button class="markbtn" id="vzfilter">✅ 行った済</button>
-      <button class="markbtn" id="bkbtn">💾 記録の保存/復元</button>
+      <button class="markbtn" id="bmfilter"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 3.5 14.6 9 20.5 9.7 16 13.8 17.3 19.6 12 16.6 6.7 19.6 8 13.8 3.5 9.7 9.4 9"/></svg> ブックマーク</button>
+      <button class="markbtn" id="vzfilter"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 12.5 9.5 18 20 6"/></svg> 行った済</button>
+      <button class="markbtn" id="bkbtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v3.5h16V15"/><line x1="12" y1="4" x2="12" y2="14.5"/><polyline points="7.5 10 12 14.5 16.5 10"/></svg> 記録の保存/復元</button>
       <span class="stats" id="stats"></span>
     </div>
     <div class="chips" id="chips"></div>
@@ -325,22 +329,22 @@
 <section class="sec" id="quiz-sec">
   <div class="sec-head"><span class="en">Quiz</span><h2>ぬまクイズ</h2></div>
   <div class="quizbar">
-    <button class="quizbtn" id="quizstart">🧠 ぬまクイズに挑戦！ — ご当地クイズ全10問</button>
-    <button class="quizbtn hard" id="quizstart2">🔥 マニア級ぬまクイズ — 難問全10問</button>
+    <button class="quizbtn" id="quizstart">ぬまクイズに挑戦！ — ご当地クイズ全10問</button>
+    <button class="quizbtn hard" id="quizstart2">マニア級ぬまクイズ — 難問全10問</button>
   </div>
 </section>
 
 <section class="sec" id="souvenir-sec">
   <div class="sec-head"><span class="en">Souvenir</span><h2>おすすめお土産</h2></div>
   <div class="omiyage">
-    <div class="ocard"><h3>🌾 南魚沼産コシヒカリ</h3><p>言わずと知れた日本トップブランド米。雪解け水と昼夜の寒暖差が育む粘りと甘み。贈答用の小袋も豊富。</p><div class="oprice">参考: 精米2kg 約1,700円</div><div class="oshop">JAみなみ魚沼直売所/道の駅「四季味わい館」ほか</div></div>
-    <div class="ocard"><h3>🥤 八海山 麹だけでつくったあまさけ</h3><p>砂糖不使用・麹の甘みだけの上品なあまさけ。機能性表示食品にもなった定番土産。</p><div class="oprice">参考: 825g 864円</div><div class="oshop">魚沼の里/市内酒店・スーパー</div></div>
-    <div class="ocard"><h3>🍶 鶴齢(かくれい) 純米吟醸</h3><p>1717年創業・塩沢の青木酒造の看板酒。淡麗辛口が多い新潟では珍しい、米の旨みを残した旨口タイプ。</p><div class="oprice">参考: 720ml 約2,000円</div><div class="oshop">牧之通り周辺・市内酒店</div></div>
-    <div class="ocard"><h3>🍶 八海山(日本酒)</h3><p>南魚沼を代表する銘酒。定番の清酒から純米大吟醸まで幅広く、小瓶の飲み比べも人気。</p><div class="oprice">参考: 720ml 1,200円台〜</div><div class="oshop">魚沼の里/市内酒店</div></div>
-    <div class="ocard"><h3>🍡 笹だんご</h3><p>よもぎ餅とあんこを笹の葉で包んだ新潟銘菓。米どころ南魚沼の餅はコシが違う。</p><div class="oprice">参考: 10個 約1,300〜1,700円</div><div class="oshop">おかしとおやき ことう/道の駅ほか</div></div>
-    <div class="ocard"><h3>🍰 さとやバウム・八海棒夢</h3><p>八海山の酒粕・大吟醸を使ったしっとりバウムクーヘン。魚沼の里の人気土産。</p><div class="oprice">参考: 小 1,000円前後</div><div class="oshop">魚沼の里「菓子処 さとや」</div></div>
-    <div class="ocard"><h3>🍉 八色スイカ(夏限定)</h3><p>大和・八色原の砂質土壌が生むシャリ感と高い糖度。7〜8月だけの季節土産。</p><div class="oprice">参考: 1玉 2,000〜3,000円台</div><div class="oshop">八色原・JAの直売所</div></div>
-    <div class="ocard"><h3>🍄 雪国まいたけ・八色しいたけ</h3><p>南魚沼が誇るきのこブランド。肉厚な八色しいたけは焼くだけでご馳走に。</p><div class="oprice">参考: 数百円〜</div><div class="oshop">直売所/市内スーパー</div></div>
+    <div class="ocard"><h3>南魚沼産コシヒカリ</h3><p>言わずと知れた日本トップブランド米。雪解け水と昼夜の寒暖差が育む粘りと甘み。贈答用の小袋も豊富。</p><div class="oprice">参考: 精米2kg 約1,700円</div><div class="oshop">JAみなみ魚沼直売所/道の駅「四季味わい館」ほか</div></div>
+    <div class="ocard"><h3>八海山 麹だけでつくったあまさけ</h3><p>砂糖不使用・麹の甘みだけの上品なあまさけ。機能性表示食品にもなった定番土産。</p><div class="oprice">参考: 825g 864円</div><div class="oshop">魚沼の里/市内酒店・スーパー</div></div>
+    <div class="ocard"><h3>鶴齢(かくれい) 純米吟醸</h3><p>1717年創業・塩沢の青木酒造の看板酒。淡麗辛口が多い新潟では珍しい、米の旨みを残した旨口タイプ。</p><div class="oprice">参考: 720ml 約2,000円</div><div class="oshop">牧之通り周辺・市内酒店</div></div>
+    <div class="ocard"><h3>八海山(日本酒)</h3><p>南魚沼を代表する銘酒。定番の清酒から純米大吟醸まで幅広く、小瓶の飲み比べも人気。</p><div class="oprice">参考: 720ml 1,200円台〜</div><div class="oshop">魚沼の里/市内酒店</div></div>
+    <div class="ocard"><h3>笹だんご</h3><p>よもぎ餅とあんこを笹の葉で包んだ新潟銘菓。米どころ南魚沼の餅はコシが違う。</p><div class="oprice">参考: 10個 約1,300〜1,700円</div><div class="oshop">おかしとおやき ことう/道の駅ほか</div></div>
+    <div class="ocard"><h3>さとやバウム・八海棒夢</h3><p>八海山の酒粕・大吟醸を使ったしっとりバウムクーヘン。魚沼の里の人気土産。</p><div class="oprice">参考: 小 1,000円前後</div><div class="oshop">魚沼の里「菓子処 さとや」</div></div>
+    <div class="ocard"><h3>八色スイカ(夏限定)</h3><p>大和・八色原の砂質土壌が生むシャリ感と高い糖度。7〜8月だけの季節土産。</p><div class="oprice">参考: 1玉 2,000〜3,000円台</div><div class="oshop">八色原・JAの直売所</div></div>
+    <div class="ocard"><h3>雪国まいたけ・八色しいたけ</h3><p>南魚沼が誇るきのこブランド。肉厚な八色しいたけは焼くだけでご馳走に。</p><div class="oprice">参考: 数百円〜</div><div class="oshop">直売所/市内スーパー</div></div>
   </div>
   <div class="onote">※価格は税込の参考目安です。時期・店舗により変わります。</div>
 </section>
@@ -348,9 +352,9 @@
 <section class="sec" id="access">
   <div class="sec-head"><span class="en">Access</span><h2>南魚沼へのアクセス</h2></div>
   <div class="access">
-    <div class="acard"><h3>🚄 新幹線で</h3><p>東京駅 → 上越新幹線で約1時間30分 → 浦佐駅。六日町方面へはJR上越線に乗り換え約15分。</p></div>
-    <div class="acard"><h3>🚗 車で</h3><p>関越自動車道「六日町IC」「塩沢石打IC」「大和スマートIC」下車。都心から約2時間30分。冬はスタッドレス必須。</p></div>
-    <div class="acard"><h3>🚃 在来線で</h3><p>JR上越線・ほくほく線が市内を縦断。中心駅は六日町駅。越後湯沢駅から約20分。</p></div>
+    <div class="acard"><h3>新幹線で</h3><p>東京駅 → 上越新幹線で約1時間30分 → 浦佐駅。六日町方面へはJR上越線に乗り換え約15分。</p></div>
+    <div class="acard"><h3>車で</h3><p>関越自動車道「六日町IC」「塩沢石打IC」「大和スマートIC」下車。都心から約2時間30分。冬はスタッドレス必須。</p></div>
+    <div class="acard"><h3>在来線で</h3><p>JR上越線・ほくほく線が市内を縦断。中心駅は六日町駅。越後湯沢駅から約20分。</p></div>
   </div>
 </section>
 
@@ -360,7 +364,7 @@
 
 <div class="routebar" id="routebar">
   <div class="routebar-inner">
-    <div class="routebar-title">🚗 マイルート<span id="rtsummary"></span></div>
+    <div class="routebar-title">マイルート<span id="rtsummary"></span></div>
     <div class="route-chips" id="routechips"></div>
     <div class="route-actions">
       <a class="btn-sm btn-go" id="routego" href="#" target="_blank" rel="noopener">現在地からルートを開く ↗</a>
@@ -1654,6 +1658,7 @@ const $overlay = document.getElementById("overlay");
 const $modal = document.getElementById("modal");
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function ic(n){ var P={search:'<circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>',pin:'<path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',star:'<polygon points="12 3.5 14.6 9 20.5 9.7 16 13.8 17.3 19.6 12 16.6 6.7 19.6 8 13.8 3.5 9.7 9.4 9"/>',check:'<polyline points="4 12.5 9.5 18 20 6"/>'}; return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+(P[n]||"")+'</svg>'; }
 
 /* Googleマップ URL */
 function mapPlaceUrl(s){
@@ -1704,7 +1709,7 @@ function renderChips(){
 const PHOTOS = {
 };
 function spotPhoto(id){ return PHOTOS.hasOwnProperty(id) ? "photos/" + encodeURIComponent(id) + ".jpg" : null; }
-function photoByHtml(id){ return PHOTOS[id] ? `<span class="ph-by">📷 撮影: ${esc(PHOTOS[id])}</span>` : ""; }
+function photoByHtml(id){ return PHOTOS[id] ? `<span class="ph-by">撮影: ${esc(PHOTOS[id])}</span>` : ""; }
 function imgFallback(el){
   const alts = (el.dataset.alt || "").split("|").filter(Boolean);
   if (alts.length){ el.dataset.alt = alts.slice(1).join("|"); el.src = alts[0]; return; }
@@ -1717,12 +1722,12 @@ function heroCredit(el){
   if (!a) return;
   if (el.src.indexOf("wikimedia.org") !== -1){
     const hp = HERO_PHOTO[el.dataset.id];
-    a.textContent = "📷 Wikimedia Commons";
+    a.textContent = "Wikimedia Commons";
     if (hp) a.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(hp.file);
     a.style.display = "";
   } else {
     const by = PHOTOS[el.dataset.id];
-    if (by){ a.textContent = "📷 撮影: " + by; a.removeAttribute("href"); a.style.display = ""; }
+    if (by){ a.textContent = "撮影: " + by; a.removeAttribute("href"); a.style.display = ""; }
     else a.remove();
   }
 }
@@ -1737,7 +1742,7 @@ function renderStats(){
   const el = document.getElementById("stats");
   if (!el) return;
   const n = vzSet.filter(id => SPOTS.some(s => s.id === id)).length;
-  el.innerHTML = `🏆 制覇率 <b>${Math.round(n / SPOTS.length * 100)}%</b>(${n}/${SPOTS.length})`;
+  el.innerHTML = `制覇率 <b>${Math.round(n / SPOTS.length * 100)}%</b>(${n}/${SPOTS.length})`;
 }
 (function(){
   const bb = document.getElementById("bmfilter"), vb = document.getElementById("vzfilter");
@@ -1754,16 +1759,16 @@ function backupOpen(){
   const data = JSON.stringify({ v:1, bm:bmSet, vz:vzSet, plan:plan });
   $modal.innerHTML = `
     <button class="close" id="mclose">✕</button>
-    <h2>💾 記録の保存・復元</h2>
+    <h2>記録の保存・復元</h2>
     <p class="sub">ブックマーク・行った済・マイルートをまとめて書き出し/復元できます。機種変更の引き継ぎにも。</p>
     <h3 class="nearby-title">保存(書き出し)</h3>
     <p class="desc" style="font-size:.8rem;margin:0">下のコードをコピーして、LINEのKeepメモやメモアプリに保存してください。</p>
     <textarea class="bkarea" id="bkout" readonly>${data}</textarea>
-    <button class="btn-sm" id="bkcopy">📋 コードをコピー</button><span class="bkmsg" id="bkmsg1"></span>
+    <button class="btn-sm" id="bkcopy">コードをコピー</button><span class="bkmsg" id="bkmsg1"></span>
     <h3 class="nearby-title">復元(読み込み)</h3>
     <p class="desc" style="font-size:.8rem;margin:0">保存しておいたコードを下に貼り付けて「復元する」を押してください。</p>
     <textarea class="bkarea" id="bkin" placeholder='{"v":1,"bm":[...],...}'></textarea>
-    <button class="btn-sm" id="bkrestore">♻️ 復元する</button><span class="bkmsg" id="bkmsg2"></span>`;
+    <button class="btn-sm" id="bkrestore">復元する</button><span class="bkmsg" id="bkmsg2"></span>`;
   $overlay.classList.add("open");
   document.getElementById("mclose").onclick = closeDetail;
   document.getElementById("bkcopy").onclick = () => {
@@ -1783,7 +1788,7 @@ function backupOpen(){
       if (Array.isArray(d.vz)) vzSet = d.vz.filter(ok);
       if (Array.isArray(d.plan)){ plan = d.plan.filter(ok); savePlan(); renderRoute(); }
       saveMarks(); renderStats(); render();
-      msg.textContent = `復元しました！(⭐${bmSet.length}件・✅${vzSet.length}件・ルート${plan.length}件)`;
+      msg.textContent = `復元しました！(ブックマーク${bmSet.length}件・行った済${vzSet.length}件・ルート${plan.length}件)`;
     } catch(e){ msg.textContent = "コードが正しくないみたい。全部コピーできているか確認してね。"; }
   };
 }
@@ -1818,7 +1823,7 @@ let cmtPhoto = "";
 function setPhotoPv(){
   const pv = document.getElementById("cmtpv");
   if (!pv) return;
-  pv.innerHTML = cmtPhoto ? '<img src="' + cmtPhoto + '" alt=""><button type="button" class="btn-sm" id="cmtpvdel">✕ 写真を外す</button>' : "";
+  pv.innerHTML = cmtPhoto ? '<img src="' + cmtPhoto + '" alt=""><button type="button" class="btn-sm" id="cmtpvdel">写真を外す</button>' : "";
   const d = document.getElementById("cmtpvdel");
   if (d) d.onclick = () => { cmtPhoto = ""; setPhotoPv(); };
 }
@@ -1863,8 +1868,8 @@ function render(){
     <div class="card" data-id="${s.id}">
       ${spotPhoto(s.id) ? `<div class="ph-wrap"><img class="card-photo" src="${spotPhoto(s.id)}" alt="" loading="lazy" onerror="this.parentNode.remove()">${photoByHtml(s.id)}</div>` : ""}
       <div><span class="badge g-${s.genre}">${s.genre}</span><span class="area"> ${esc(s.area)}エリア</span></div>
-      <h3>${esc(s.name)}${bmSet.includes(s.id) ? " ⭐" : ""}${vzSet.includes(s.id) ? " ✅" : ""}</h3>
-      ${nearSort && userPos ? `<div class="dist">📍 ${distKm(userPos,s).toFixed(1)}km・車で約${driveMin(distKm(userPos,s))}分</div>` : ""}
+      <h3>${esc(s.name)}${bmSet.includes(s.id) ? " ★" : ""}${vzSet.includes(s.id) ? " ✓" : ""}</h3>
+      ${nearSort && userPos ? `<div class="dist">${ic('pin')} ${distKm(userPos,s).toFixed(1)}km・車で約${driveMin(distKm(userPos,s))}分</div>` : ""}
       <p>${esc(s.desc)}</p>
       <div class="tags">${(s.tags||[]).map(t=>"#"+esc(t)).join(" ")}</div>
     </div>`).join("") || `<p style="color:var(--muted)">該当するスポットがありません。</p>`;
@@ -1892,7 +1897,7 @@ function openDetail(id){
     <p class="sub">${esc(s.address)}</p>
     ${spotPhoto(id) ? `<div class="ph-wrap"><img class="dt-photo" src="${spotPhoto(id)}" alt="" onerror="this.parentNode.remove()">${photoByHtml(id)}</div>` : ""}
     <p class="desc">${esc(s.desc)}</p>
-    ${s.niche ? `<div class="niche"><b>💡 ニッチ情報・穴場メモ</b>${esc(s.niche)}</div>` : ""}
+    ${s.niche ? `<div class="niche"><b>ニッチ情報・穴場メモ</b>${esc(s.niche)}</div>` : ""}
     <dl class="info">
       <dt>営業時間</dt><dd>${esc(s.hours)}</dd>
       <dt>料金</dt><dd>${esc(s.price)}</dd>
@@ -1900,13 +1905,13 @@ function openDetail(id){
       <dt>ベストシーズン</dt><dd>${esc(s.season)}</dd>
     </dl>
     <div class="btns">
-      <a class="btn btn-map" href="${mapPlaceUrl(s)}" target="_blank" rel="noopener">📍 Googleマップで開く</a>
-      <a class="btn btn-route" href="${mapRouteUrl(null, s)}" target="_blank" rel="noopener">🚗 現在地からのルート</a>
-      <button class="btn btn-add" id="madd">${plan.includes(s.id) ? "✓ ルート追加済み" : "➕ ルートに追加"}</button>
-      <button class="btn btn-mark" id="mbm">${bmSet.includes(s.id) ? "⭐ ブックマーク済" : "☆ ブックマーク"}</button>
-      <button class="btn btn-mark" id="mvz">${vzSet.includes(s.id) ? "✅ 行った！" : "⬜ まだ行ってない"}</button>
+      <a class="btn btn-map" href="${mapPlaceUrl(s)}" target="_blank" rel="noopener">Googleマップで開く</a>
+      <a class="btn btn-route" href="${mapRouteUrl(null, s)}" target="_blank" rel="noopener">現在地からのルート</a>
+      <button class="btn btn-add" id="madd">${plan.includes(s.id) ? "✓ ルート追加済み" : "ルートに追加"}</button>
+      <button class="btn btn-mark" id="mbm">${bmSet.includes(s.id) ? "★ ブックマーク済" : "☆ ブックマーク"}</button>
+      <button class="btn btn-mark" id="mvz">${vzSet.includes(s.id) ? "✓ 行った！" : "まだ行ってない"}</button>
     </div>
-    <h3 class="nearby-title">🧭 おすすめの組み合わせ(近くのジャンル違い)</h3>
+    <h3 class="nearby-title">おすすめの組み合わせ(近くのジャンル違い)</h3>
     <div class="nearby">
       ${suggest.map(n => `
         <div class="nb" data-id="${n.spot.id}">
@@ -1933,14 +1938,14 @@ function openDetail(id){
         </div>`).join("")}
     </div>
     ${FB_PROJECT_ID ? `
-    <h3 class="nearby-title">💬 みんなのコメント</h3>
+    <h3 class="nearby-title">みんなのコメント</h3>
     <div id="cmts" class="cmts"><p class="sub">読み込み中…</p></div>
     <div class="cmtform">
       <input id="cmtname" type="text" placeholder="なまえ(省略OK)" maxlength="20">
       <textarea id="cmttext" placeholder="感想・おすすめ情報など(500文字まで)" maxlength="500"></textarea>
       <div id="cmtpv" class="cmtpv"></div>
-      <div><button class="btn-sm" type="button" id="cmtphoto">📷 写真を追加</button><input id="cmtfile" type="file" accept="image/*" style="display:none"></div>
-      <div><button class="btn-sm" id="cmtpost">💬 投稿する</button><span class="bkmsg" id="cmtmsg"></span></div>
+      <div><button class="btn-sm" type="button" id="cmtphoto">写真を追加</button><input id="cmtfile" type="file" accept="image/*" style="display:none"></div>
+      <div><button class="btn-sm" id="cmtpost">投稿する</button><span class="bkmsg" id="cmtmsg"></span></div>
     </div>` : ""}
     <div id="gplaces"></div>`;
   $overlay.classList.add("open");
@@ -1954,12 +1959,12 @@ function openDetail(id){
   };
   document.getElementById("mbm").onclick = () => {
     toggleMark(bmSet, s.id);
-    document.getElementById("mbm").textContent = bmSet.includes(s.id) ? "⭐ ブックマーク済" : "☆ ブックマーク";
+    document.getElementById("mbm").textContent = bmSet.includes(s.id) ? "★ ブックマーク済" : "☆ ブックマーク";
     render();
   };
   document.getElementById("mvz").onclick = () => {
     toggleMark(vzSet, s.id);
-    document.getElementById("mvz").textContent = vzSet.includes(s.id) ? "✅ 行った！" : "⬜ まだ行ってない";
+    document.getElementById("mvz").textContent = vzSet.includes(s.id) ? "✓ 行った！" : "まだ行ってない";
     render();
   };
   document.getElementById("maddall").onclick = () => {
@@ -2103,14 +2108,14 @@ function openCourse(cid){
 
   $modal.innerHTML = `
     <button class="close" id="mclose">✕</button>
-    <h2>🗺 ${esc(c.title)}</h2>
+    <h2>${esc(c.title)}</h2>
     <p class="sub">${esc(c.duration)} ・ ベストシーズン: ${esc(c.season)} ・ 移動合計 約${total.toFixed(1)}km / 車で約${driveMin(total)}分(目安)</p>
     <p class="desc">${esc(c.catch)}</p>
-    <div class="niche"><b>💡 コースのコツ</b>${esc(c.tip)}</div>
+    <div class="niche"><b>コースのコツ</b>${esc(c.tip)}</div>
     <div class="nearby">${rows}</div>
     <div class="btns" style="margin-top:16px">
-      <a class="btn btn-map" href="${routeGmapsUrl(sp)}" target="_blank" rel="noopener">🚗 現在地からこのコースのルートを開く</a>
-      <button class="btn btn-add" id="csetroute">➕ マイルートにセット</button>
+      <a class="btn btn-map" href="${routeGmapsUrl(sp)}" target="_blank" rel="noopener">現在地からこのコースのルートを開く</a>
+      <button class="btn btn-add" id="csetroute">マイルートにセット</button>
     </div>`;
   $overlay.classList.add("open");
   document.getElementById("mclose").onclick = closeDetail;
@@ -2147,9 +2152,9 @@ function renderSeasons(){
   if (!el) return;
   el.innerHTML = SEASONS.map(s => `
     <div class="scard">
-      <div class="sphoto sp-${s.name}">${s.photo ? `<img src="${s.photo}" alt="${s.name}">` : s.emoji}</div>
+      <div class="sphoto sp-${s.name}">${s.photo ? `<img src="${s.photo}" alt="${s.name}">` : esc(s.name)}</div>
       <div class="sbody">
-        <h3>${s.emoji} ${s.name} — ${esc(s.title)}</h3>
+        <h3>${s.name} — ${esc(s.title)}</h3>
         <ul>${s.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
       </div>
     </div>`).join("");
@@ -2213,8 +2218,8 @@ function quizShow(){
   const q = qzSet[qzIdx];
   $modal.innerHTML = `
     <button class="close" onclick="closeDetail()">×</button>
-    <div class="qz-prog">${qzHard ? "🔥マニア級　" : ""}第${qzIdx+1}問 / 全${qzSet.length}問　正解数: ${qzScore}</div>
-    <h2>🧠 ${esc(q.q)}</h2>
+    <div class="qz-prog">${qzHard ? "マニア級　" : ""}第${qzIdx+1}問 / 全${qzSet.length}問　正解数: ${qzScore}</div>
+    <h2>${esc(q.q)}</h2>
     <div style="margin-top:14px">${q.c.map((c,i)=>`<button class="qz-choice" data-i="${i}">${"ABC"[i]}. ${esc(c)}</button>`).join("")}</div>
     <div id="qzresult"></div>`;
   $modal.querySelectorAll(".qz-choice").forEach(b => b.onclick = () => quizAnswer(+b.dataset.i));
@@ -2230,19 +2235,19 @@ function quizAnswer(i){
   const ok = i === q.a;
   if (ok) qzScore++;
   document.getElementById("qzresult").innerHTML = `
-    <div class="qz-exp"><b>${ok ? "⭕ 正解！" : "❌ 残念…正解は「" + esc(q.c[q.a]) + "」"}</b><br>${esc(q.exp)}</div>
+    <div class="qz-exp"><b>${ok ? "正解！" : "残念…正解は「" + esc(q.c[q.a]) + "」"}</b><br>${esc(q.exp)}</div>
     <button class="qz-next" id="qznext">${qzIdx < qzSet.length-1 ? "次の問題へ →" : "結果を見る"}</button>`;
   document.getElementById("qznext").onclick = () => { qzIdx++; qzIdx < qzSet.length ? quizShow() : quizResult(); };
 }
 function quizResult(){
-  const r = qzHard && qzScore >= 9 ? "👑 真のぬま博士！マニア級制覇、地元民超えです" :
-            qzScore >= 9 ? "🏆 ぬま博士！地元民レベルです" :
-            qzScore >= 7 ? "🎉 ぬま通！かなり詳しい" :
-            qzScore >= 4 ? "🙂 ぬま入門者。旅すればもっと詳しくなる" :
-                           "🌱 これから！アプリで予習して出かけよう";
+  const r = qzHard && qzScore >= 9 ? "真のぬま博士！マニア級制覇、地元民超えです" :
+            qzScore >= 9 ? "ぬま博士！地元民レベルです" :
+            qzScore >= 7 ? "ぬま通！かなり詳しい" :
+            qzScore >= 4 ? "ぬま入門者。旅すればもっと詳しくなる" :
+                           "これから！アプリで予習して出かけよう";
   $modal.innerHTML = `
     <button class="close" onclick="closeDetail()">×</button>
-    <h2>${qzHard ? "🔥 マニア級" : "🧠"} クイズ結果</h2>
+    <h2>${qzHard ? "マニア級 " : ""}クイズ結果</h2>
     <p style="font-size:2rem;margin:14px 0">${qzScore} / ${qzSet.length} 問正解</p>
     <p style="font-size:1.05rem">${r}</p>
     <button class="qz-next" onclick="quizStart()" style="margin-right:8px">もう一度挑戦</button>
@@ -2314,11 +2319,11 @@ $nearbtn.onclick = () => {
   if (nearSort){ nearSort = false; $nearbtn.classList.remove("active"); render(); return; }
   if (userPos){ nearSort = true; $nearbtn.classList.add("active"); render(); return; }
   if (!navigator.geolocation){ alert("この端末では現在地を取得できません"); return; }
-  $nearbtn.textContent = "📍 現在地を取得中…";
+  $nearbtn.innerHTML = ic('pin') + " 現在地を取得中…";
   navigator.geolocation.getCurrentPosition(p => {
     userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
     nearSort = true;
-    $nearbtn.textContent = "📍 現在地から近い順に並べる";
+    $nearbtn.innerHTML = ic('pin') + " 現在地から近い順に並べる";
     $nearbtn.classList.add("active");
     if (numaMap && typeof L !== "undefined"){
       L.circleMarker([userPos.lat, userPos.lng], { radius:9, color:"#fff", weight:2.5, fillColor:"#2b6ef2", fillOpacity:1 })
@@ -2326,7 +2331,7 @@ $nearbtn.onclick = () => {
     }
     render();
   }, () => {
-    $nearbtn.textContent = "📍 現在地から近い順に並べる";
+    $nearbtn.innerHTML = ic('pin') + " 現在地から近い順に並べる";
     alert("現在地を取得できませんでした。位置情報の許可を確認してください。");
   });
 };
@@ -2351,10 +2356,10 @@ const HERO_PHOTO = {
     "https://upload.wikimedia.org/wikipedia/commons/6/6b/Sakado_Castle_site.jpg" ] }
 };
 const HERO_GRAD = {
-  "観光":"linear-gradient(150deg,#5d3f80,#9b72c0)", "自然":"linear-gradient(150deg,#1e6b45,#67b98d)",
-  "宿泊":"linear-gradient(150deg,#39448f,#7986cb)", "温泉":"linear-gradient(150deg,#2b5c8f,#6fa3d4)",
-  "飲食":"linear-gradient(150deg,#b34e28,#e8734a)", "カフェ":"linear-gradient(150deg,#9a6f22,#c9973a)",
-  "買物":"linear-gradient(150deg,#833f5b,#ad5f7d)"
+  "観光":"#5d3f80", "自然":"#1e6b45",
+  "宿泊":"#39448f", "温泉":"#2b5c8f",
+  "飲食":"#b34e28", "カフェ":"#9a6f22",
+  "買物":"#833f5b"
 };
 var heroCur = 0;
 function heroGo(i){
@@ -2370,7 +2375,7 @@ function heroGo(i){
   items.forEach((s,i) => {
     const d = document.createElement("div");
     d.className = "hero-slide" + (i===0 ? " on" : "");
-    d.style.background = HERO_GRAD[s.genre] || "linear-gradient(150deg,#16616c,#218a99)";
+    d.style.background = HERO_GRAD[s.genre] || "#16616c";
     const cand = [];
     if (PHOTOS.hasOwnProperty(s.id)) cand.push(spotPhoto(s.id));
     const hp = HERO_PHOTO[s.id];
@@ -2394,11 +2399,10 @@ const PICKUP_IDS = ["tabataya","yukiakari","satoya","sucre","sanaburi","keyakien
 (function(){
   const $p = document.getElementById("pickup");
   if (!$p) return;
-  const EMOJI = { "観光":"⛩️", "自然":"🏔️", "飲食":"🍜", "カフェ":"☕", "温泉":"♨️", "宿泊":"🏠", "買物":"🛍️" };
   PICKUP_IDS.map(id => SPOTS.find(s => s.id === id)).filter(Boolean).forEach(s => {
     const d = document.createElement("div");
     d.className = "pcard";
-    d.innerHTML = `<div class="pthumb g-${s.genre}">${spotPhoto(s.id) ? `<img class="pphoto" src="${spotPhoto(s.id)}" alt="" loading="lazy" onerror="this.remove()">` : ""}${EMOJI[s.genre]||"📍"}</div><div class="pbody"><h3>${esc(s.name)}</h3><p>${esc(s.desc||"")}</p></div>`;
+    d.innerHTML = `<div class="pthumb g-${s.genre}">${spotPhoto(s.id) ? `<img class="pphoto" src="${spotPhoto(s.id)}" alt="" loading="lazy" onerror="this.remove()">` : ""}<span class="pthumb-g">${esc(s.genre)}</span></div><div class="pbody"><h3>${esc(s.name)}</h3><p>${esc(s.desc||"")}</p></div>`;
     d.onclick = () => openDetail(s.id);
     $p.appendChild(d);
   });
