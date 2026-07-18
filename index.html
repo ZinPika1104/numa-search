@@ -252,6 +252,9 @@
 .sortlab{font-size:.8rem;color:var(--muted)}
 .sortbtn{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 14px;cursor:pointer;font-size:.85rem;color:var(--text)}
 .sortbtn.on{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.card-top{display:flex;align-items:center;gap:4px}
+.vztgl{margin-left:auto;border:1px solid var(--line);background:var(--card);border-radius:16px;padding:4px 10px;cursor:pointer;font-size:.75rem;color:var(--muted);white-space:nowrap}
+.vztgl.on{background:#e8f5ec;border-color:#4c9a58;color:#2e7d3e;font-weight:600}
 .rank-spot{cursor:pointer}
 </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -2041,13 +2044,14 @@ function render(){
   $grid.innerHTML = list.map(s => `
     <div class="card" data-id="${s.id}">
       ${spotPhoto(s.id) ? `<div class="ph-wrap"><img class="card-photo" src="${spotPhoto(s.id)}" alt="" loading="lazy" onerror="this.parentNode.remove()">${photoByHtml(s.id)}</div>` : ""}
-      <div><span class="badge g-${s.genre}">${s.genre}</span><span class="area"> ${esc(s.area)}エリア</span></div>
-      <h3>${esc(s.name)}${bmSet.includes(s.id) ? " ⭐" : ""}${vzSet.includes(s.id) ? " ✅" : ""}</h3>
+      <div class="card-top"><span class="badge g-${s.genre}">${s.genre}</span><span class="area"> ${esc(s.area)}エリア</span><button class="vztgl${vzSet.includes(s.id) ? " on" : ""}" data-vzid="${s.id}">${vzSet.includes(s.id) ? "✅ 行った！" : "⬜ 行った"}</button></div>
+      <h3>${esc(s.name)}${bmSet.includes(s.id) ? " ⭐" : ""}</h3>
       ${nearSort && userPos ? `<div class="dist">📍 ${distKm(userPos,s).toFixed(1)}km・車で約${driveMin(distKm(userPos,s))}分</div>` : ""}
       <p>${esc(s.desc)}</p>
       <div class="tags">${(s.tags||[]).map(t=>"#"+esc(t)).join(" ")}</div>
     </div>`).join("") || `<p style="color:var(--muted)">該当するスポットがありません。</p>`;
   $grid.querySelectorAll(".card").forEach(c => c.onclick = () => openDetail(c.dataset.id));
+  $grid.querySelectorAll(".vztgl").forEach(b => b.onclick = (e) => { e.stopPropagation(); toggleMark(vzSet, b.dataset.vzid); render(); });
 }
 
 function openDetail(id){
