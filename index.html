@@ -251,6 +251,9 @@
 .rankpanel{background:linear-gradient(160deg,#1b6d7a,#0d3b43 55%,#092b32);border-radius:18px;padding:18px 16px;color:#eef6f7;box-shadow:0 10px 26px rgba(13,59,67,.28)}
 .rankpanel .rtab{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#eef6f7}
 .rankpanel .rtab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.rkareas{margin:2px 0 10px;flex-wrap:wrap}
+.rankpanel .ratab{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);border-radius:16px;padding:4px 11px;cursor:pointer;font-size:.78rem;color:rgba(238,246,247,.85)}
+.rankpanel .ratab.on{background:#eef6f7;border-color:#eef6f7;color:#0d3b43;font-weight:700}
 .rksub{font-size:.8rem;color:rgba(238,246,247,.75);margin:8px 0;line-height:1.6}
 .iconpick{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 .icbtn{width:40px;height:40px;font-size:1.25rem;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);cursor:pointer;padding:0}
@@ -349,6 +352,12 @@
       <button class="rtab on" data-rt="vz">🏆 制覇率</button>
       <button class="rtab" data-rt="want">💖 行きたい</button>
       <button class="rtab" data-rt="like">👍 いいね</button>
+    </div>
+    <div class="ranktabs rkareas">
+      <button class="ratab on" data-ra="">🗾 全域</button>
+      <button class="ratab" data-ra="六日町">六日町</button>
+      <button class="ratab" data-ra="塩沢">塩沢</button>
+      <button class="ratab" data-ra="大和">浦佐・大和</button>
     </div>
     <div id="rkjoinwrap">
       <p class="rksub">アイコンとニックネームを選んで参加すると、この端末の「✅ 行った！」件数がランキングに載ります(参加した人はみんな表示)。さらに20位以内に入ると、選んだ「推しスポット」が上の『いま推したいスポット』に順位・名前つきで紹介されます。送られるのはアイコン・ニックネーム・件数・推しスポットだけです。</p>
@@ -1986,11 +1995,16 @@ function myRankId(){
 function rankName(){ try { return localStorage.getItem("numaRankName") || ""; } catch(e){ return ""; } }
 function rankSpot(){ try { return localStorage.getItem("numaRankSpot") || ""; } catch(e){ return ""; } }
 function vzCount(){ return vzSet.filter(id => SPOTS.some(s => s.id === id)).length; }
+var rankArea = "";
+var RANK_AREAS = { "六日町":"a1", "塩沢":"a2", "大和":"a3" };
+function vzCountArea(a){ return vzSet.filter(id => SPOTS.some(s => s.id === id && s.area === a)).length; }
+function areaTotal(a){ return SPOTS.filter(s => s.area === a).length; }
 function sendRank(nm){
   return fetch(fbBase() + "/ranking/" + myRankId() + "?key=" + FB_API_KEY, {
     method: "PATCH", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fields: { name: { stringValue: ((rankIcon() ? rankIcon() + " " : "") + nm).slice(0, 20) }, n: { integerValue: String(vzCount()) },
-      t: { integerValue: String(SPOTS.length) }, ts: { integerValue: String(Date.now()) }, sp: { stringValue: (rankSpot() || "").slice(0, 40) } } })
+      t: { integerValue: String(SPOTS.length) }, ts: { integerValue: String(Date.now()) }, sp: { stringValue: (rankSpot() || "").slice(0, 40) },
+      a1: { integerValue: String(vzCountArea("六日町")) }, a2: { integerValue: String(vzCountArea("塩沢")) }, a3: { integerValue: String(vzCountArea("大和")) } } })
   });
 }
 function pushRank(){
@@ -2074,6 +2088,12 @@ function initRank(){
       }).catch(() => { msg.textContent = "処理に失敗しました。時間をおいて試してね。"; });
     };
   }
+  document.querySelectorAll("#ranking-sec .ratab").forEach(b => b.onclick = () => {
+    rankArea = b.dataset.ra;
+    document.querySelectorAll("#ranking-sec .ratab").forEach(x => x.classList.toggle("on", x === b));
+    const cur = document.querySelector("#ranking-sec .rtab.on");
+    (!cur || cur.dataset.rt === "vz") ? loadRank(me) : loadSpotRank(cur.dataset.rt);
+  });
   document.querySelectorAll("#ranking-sec .rtab").forEach(b => b.onclick = () => {
     document.querySelectorAll("#ranking-sec .rtab").forEach(x => x.classList.toggle("on", x === b));
     if (b.dataset.rt === "vz"){ wrap.style.display = ""; loadRank(me); }
@@ -2089,14 +2109,22 @@ function loadRank(me){
     body: JSON.stringify({ structuredQuery: { from: [{ collectionId: "ranking" }],
       orderBy: [{ field: { fieldPath: "n" }, direction: "DESCENDING" }], limit: 200 } })
   }).then(r => r.json()).then(rows => {
-    const list = (Array.isArray(rows) ? rows : []).filter(r => r.document).map(r => {
+    let list = (Array.isArray(rows) ? rows : []).filter(r => r.document).map(r => {
       const f = r.document.fields || {};
       return { id: r.document.name.split("/").pop(),
         name: (f.name && f.name.stringValue) || "名無しのぬま人",
         n: Number((f.n && f.n.integerValue) || 0),
         t: Number((f.t && f.t.integerValue) || SPOTS.length),
-        ts: Number((f.ts && f.ts.integerValue) || 0) };
+        ts: Number((f.ts && f.ts.integerValue) || 0),
+        a1: Number((f.a1 && f.a1.integerValue) || 0),
+        a2: Number((f.a2 && f.a2.integerValue) || 0),
+        a3: Number((f.a3 && f.a3.integerValue) || 0) };
     }).filter(e => e.ts > 0);
+    if (rankArea){
+      const k = RANK_AREAS[rankArea], tot = areaTotal(rankArea);
+      list.forEach(e => { e.n = e[k]; e.t = tot; });
+      list.sort((x, y) => y.n - x.n);
+    }
     if (!list.length){ box.innerHTML = `<p class="rksub">まだ誰も参加していません。一番乗りで参加しよう！</p>`; return; }
     const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : String(i + 1);
     box.innerHTML = list.map((e, i) => {
@@ -2117,13 +2145,13 @@ function loadSpotRank(field){
   fetch(fbBase() + ":runQuery?key=" + FB_API_KEY, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ structuredQuery: { from: [{ collectionId: "reactions" }],
-      orderBy: [{ field: { fieldPath: field }, direction: "DESCENDING" }], limit: 30 } })
+      orderBy: [{ field: { fieldPath: field }, direction: "DESCENDING" }], limit: 100 } })
   }).then(r => r.json()).then(rows => {
     const list = (Array.isArray(rows) ? rows : []).filter(r => r.document).map(r => {
       const f = r.document.fields || {};
       return { id: r.document.name.split("/").pop(), n: Number((f[field] && f[field].integerValue) || 0) };
     }).map(e => ({ n: e.n, s: SPOTS.find(x => x.id === e.id) }))
-      .filter(x => x.s && x.n > 0).slice(0, 10);
+      .filter(x => x.s && x.n > 0 && (!rankArea || x.s.area === rankArea)).slice(0, 10);
     if (!list.length){ box.innerHTML = `<p class="rksub">まだ${field === "want" ? "「💖 行きたい！」" : "「👍 いいね」"}がありません。スポット詳細からリアクションしてみよう！</p>`; return; }
     const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : String(i + 1);
     const label = field === "want" ? "💖" : "👍";
