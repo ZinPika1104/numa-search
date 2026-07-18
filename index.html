@@ -258,6 +258,8 @@
 .rkform{display:flex;gap:8px;margin:8px 0}
 .rkform input{flex:1;min-width:0;border:none;border-radius:10px;padding:10px 12px;font-size:.95rem}
 .rkjoinbtn{border:none;border-radius:10px;padding:10px 16px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap}
+.rkleave{display:block;margin:6px 0 0;background:none;border:none;color:rgba(255,255,255,.55);font-size:12px;text-decoration:underline;cursor:pointer;padding:0}
+.rkleave:hover{color:rgba(255,255,255,.85)}
 .rankpanel .bkmsg{color:#ffd9a8;font-size:.8rem}
 .rankpanel .rankrow{border-bottom:none;background:rgba(255,255,255,.07);border-radius:12px;margin-top:8px;padding:10px 12px;font-size:.95rem}
 .rankpanel .rankrow.r1{background:linear-gradient(90deg,rgba(255,196,56,.4),rgba(255,255,255,.07) 70%)}
@@ -360,6 +362,7 @@
       </div>
       <div class="rkform"><select id="rkrow"></select><select id="rkspot"><option value="">📣 推しスポットを選ぶ(任意)</option></select></div>
       <span class="bkmsg" id="rkmsg"></span>
+      <button class="rkleave" id="rkleave" style="display:none">🚪 ランキングから抜ける</button>
     </div>
     <div id="rklist"><p class="rksub">読み込み中…</p></div>
   </div>
@@ -2037,7 +2040,7 @@ function initRank(){
     try { localStorage.setItem("numaRankName", nm); } catch(e){}
     msg.textContent = "送信中…";
     sendRank(nm)
-      .then(r => { if (!r.ok) throw 0; msg.textContent = "登録しました！(✅" + vzCount() + "件)"; jb.textContent = "記録を更新する"; loadRank(me); loadPickupRecs(); })
+      .then(r => { if (!r.ok) throw 0; msg.textContent = "登録しました！(✅" + vzCount() + "件)"; jb.textContent = "記録を更新する"; document.getElementById("rkleave").style.display = ""; loadRank(me); loadPickupRecs(); })
       .catch(() => { msg.textContent = "送信に失敗しました。時間をおいて試してね。"; });
   };
   const sel = document.getElementById("rkspot");
@@ -2061,6 +2064,28 @@ function initRank(){
       if (rankName()){ sendRank(rankName()).then(() => loadPickupRecs()).catch(() => {}); }
     };
   }
+  const lb = document.getElementById("rkleave");
+  if (lb){
+    lb.style.display = rankName() ? "" : "none";
+    lb.onclick = () => {
+      if (!confirm("ランキングから抜けますか？（あとで参加し直すこともできます）")) return;
+      const msg = document.getElementById("rkmsg");
+      msg.textContent = "処理中…";
+      fetch(fbBase() + "/ranking/" + me + "?key=" + FB_API_KEY, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fields: { name: { stringValue: "×" }, n: { integerValue: "0" },
+          t: { integerValue: String(SPOTS.length) }, ts: { integerValue: "0" }, sp: { stringValue: "" } } })
+      }).then(r => {
+        if (!r.ok) throw 0;
+        try { localStorage.removeItem("numaRankName"); localStorage.removeItem("numaRankSpot"); } catch(e){}
+        inp.value = ""; if (sel) sel.value = "";
+        jb.textContent = "ランキングに参加する";
+        lb.style.display = "none";
+        msg.textContent = "ランキングから抜けました";
+        loadRank(me); loadPickupRecs();
+      }).catch(() => { msg.textContent = "処理に失敗しました。時間をおいて試してね。"; });
+    };
+  }
   document.querySelectorAll("#ranking-sec .rtab").forEach(b => b.onclick = () => {
     document.querySelectorAll("#ranking-sec .rtab").forEach(x => x.classList.toggle("on", x === b));
     if (b.dataset.rt === "vz"){ wrap.style.display = ""; loadRank(me); }
@@ -2081,8 +2106,9 @@ function loadRank(me){
       return { id: r.document.name.split("/").pop(),
         name: (f.name && f.name.stringValue) || "名無しのぬま人",
         n: Number((f.n && f.n.integerValue) || 0),
-        t: Number((f.t && f.t.integerValue) || SPOTS.length) };
-    });
+        t: Number((f.t && f.t.integerValue) || SPOTS.length),
+        ts: Number((f.ts && f.ts.integerValue) || 0) };
+    }).filter(e => e.ts > 0);
     if (!list.length){ box.innerHTML = `<p class="rksub">まだ誰も参加していません。一番乗りで参加しよう！</p>`; return; }
     const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : String(i + 1);
     box.innerHTML = list.map((e, i) => {
@@ -2134,6 +2160,7 @@ function loadPickupRecs(){
     const cards = [];
     (Array.isArray(rows) ? rows : []).filter(r => r.document).forEach((r, i) => {
       const f = r.document.fields || {};
+      if (!Number((f.ts && f.ts.integerValue) || 0)) return;
       const sp = (f.sp && f.sp.stringValue) || "";
       if (!sp) return;
       const s = SPOTS.find(x => x.id === sp);
