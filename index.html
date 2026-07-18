@@ -279,6 +279,7 @@
 .rankpanel .rkn small{font-weight:400;font-size:.7rem;color:rgba(238,246,247,.75)}
 .rkform select{flex:1;min-width:0;border:none;border-radius:10px;padding:10px 12px;font-size:.9rem;background:#fff;color:var(--text)}
 .rkform select#rkrow{flex:0 0 auto;width:auto}
+.rkform input#rkspotq{flex:1 1 120px}
 .pcard.rec{border-color:var(--accent)}
 .recribbon{background:linear-gradient(90deg,var(--accent),#f0906a);color:#fff;font-size:.72rem;font-weight:700;padding:5px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sortbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -356,7 +357,7 @@
         <input id="rkname" type="text" placeholder="ニックネーム(12文字まで)" maxlength="12">
         <button class="rkjoinbtn" id="rkjoin">参加する</button>
       </div>
-      <div class="rkform"><select id="rkrow"></select><select id="rkspot"><option value="">📣 推しスポットを選ぶ(任意)</option></select></div>
+      <div class="rkform"><input id="rkspotq" type="text" placeholder="🔍 スポット名で検索"><select id="rkrow"></select><select id="rkspot"><option value="">📣 推しスポットを選ぶ(任意)</option></select></div>
       <span class="bkmsg" id="rkmsg"></span>
       <button class="rkleave" id="rkleave" style="display:none">🚪 ランキングから抜ける</button>
     </div>
@@ -2030,8 +2031,11 @@ function initRank(){
   const rowSel = document.getElementById("rkrow");
   if (sel){
     const opts = SPOTS.slice().sort((a, b) => spotKana(a).localeCompare(spotKana(b), "ja"));
+    const qInp = document.getElementById("rkspotq");
     const fill = (row) => {
-      const f = row ? opts.filter(s => kanaRowOf(spotKana(s).charAt(0)) === row) : opts;
+      const q = qInp ? qInp.value.trim().toLowerCase() : "";
+      let f = row ? opts.filter(s => kanaRowOf(spotKana(s).charAt(0)) === row) : opts;
+      if (q) f = f.filter(s => s.name.toLowerCase().includes(q) || spotKana(s).includes(q));
       sel.innerHTML = `<option value="">📣 推しスポットを選ぶ(任意)</option>` + f.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join("");
       sel.value = rankSpot();
       if (sel.value !== rankSpot()) sel.value = "";
@@ -2040,6 +2044,7 @@ function initRank(){
       rowSel.innerHTML = `<option value="">すべての行</option>` + "あかさたなはまやらわ".split("").map(k => `<option value="${k}">${k}行</option>`).join("");
       rowSel.onchange = () => fill(rowSel.value);
     }
+    if (qInp) qInp.oninput = () => fill(rowSel ? rowSel.value : "");
     fill("");
     sel.onchange = () => {
       if (!sel.value) return;
