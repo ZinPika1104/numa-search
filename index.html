@@ -235,6 +235,30 @@
   .sitefoot .fnote { opacity:.75; line-height:1.8; }
   @media (max-width:520px){ .info{grid-template-columns:1fr;} .info dt{margin-top:6px;} }
 
+/* ハンバーガー・パンくず・ヒーロー矢印 */
+html { scroll-behavior:smooth; }
+.sec, .hero, #pickup-sec { scroll-margin-top:60px; }
+.hamburger { display:none; flex-direction:column; justify-content:center; gap:4px; width:38px; height:38px; border:none; background:transparent; cursor:pointer; padding:8px; }
+.hamburger span { display:block; height:2px; background:var(--indigo); border-radius:2px; transition:.2s; }
+.hamburger.open span:nth-child(1){ transform:translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2){ opacity:0; }
+.hamburger.open span:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
+@media (max-width:720px){
+  .hamburger { display:flex; }
+  .gnav { position:absolute; top:100%; left:0; right:0; flex-direction:column; gap:0; background:#fff; box-shadow:0 8px 16px rgba(20,52,63,.12); max-height:0; overflow:hidden; transition:max-height .25s ease; }
+  .gnav.open { max-height:380px; }
+  .gnav a { padding:12px 16px; border-bottom:1px solid var(--line); font-size:.95rem; }
+}
+.breadcrumb { max-width:1100px; margin:10px auto 0; padding:0 16px; font-size:.78rem; color:var(--muted); display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.breadcrumb a { color:var(--indigo); text-decoration:none; cursor:pointer; }
+.breadcrumb a:hover { text-decoration:underline; }
+.breadcrumb .sep { color:#c3ced3; }
+.breadcrumb .current { color:var(--text); font-weight:bold; }
+.hero-arrow { position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:50%; border:none; background:rgba(255,255,255,.82); color:var(--indigo-dark); font-size:1.4rem; line-height:1; cursor:pointer; z-index:4; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.25); transition:.15s; }
+.hero-arrow:hover { background:#fff; }
+.hero-prev { left:12px; } .hero-next { right:12px; }
+@media (max-width:520px){ .hero-arrow { width:34px; height:34px; font-size:1.2rem; } }
+
 /* リアクション・ランキング */
 .reactbar{display:flex;gap:8px;margin:10px 0 4px}
 .reactbtn{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 14px;cursor:pointer;font-size:.9rem;color:var(--text)}
@@ -318,8 +342,9 @@
 
 <header class="sitehead">
   <div class="sitehead-inner">
-    <a class="logo" href="#">ぬま<span>サーチ</span></a>
-    <nav class="gnav">
+    <a class="logo" href="#" id="navLogo">ぬま<span>サーチ</span></a>
+    <button class="hamburger" id="hamburger" aria-label="メニュー" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="gnav" id="gnav">
       <a href="#search">スポット検索</a>
       <a href="#ranking-sec">ランキング</a>
       <a href="#courses-sec">モデルコース</a>
@@ -331,12 +356,16 @@
   </div>
 </header>
 
+<nav class="breadcrumb" id="breadcrumb" aria-label="パンくずリスト"></nav>
+
 <div class="hero" id="hero">
   <div class="hero-slides" id="heroslides"></div>
   <div class="hero-copy">
     <p class="hero-catch">一つ選ぶと、旅程が広がる。</p>
-    <p class="hero-sub">南魚沼市の定番からニッチまで 363スポット</p>
+    <p class="hero-sub">南魚沼市の定番からニッチまで 364スポット</p>
   </div>
+  <button class="hero-arrow hero-prev" id="heroPrev" aria-label="前のスポット">&#8249;</button>
+  <button class="hero-arrow hero-next" id="heroNext" aria-label="次のスポット">&#8250;</button>
   <div class="hero-dots" id="herodots"></div>
 </div>
 
@@ -477,6 +506,11 @@
    area:  六日町 / 塩沢 / 大和
 ============================================================ */
 const SPOTS = [
+ { id:"huckleberry", name:"ハックルベリー", genre:"飲食", area:"大和",
+   desc:"浦佐駅近くにある軽食・グルメの店。気軽に立ち寄れる地元の飲食スポット。",
+   niche:"月〜土の10:00〜19:00営業、日曜定休(祝日は営業)。店の前に数台分の駐車スペースあり。支払いは現金のみ。",
+   address:"南魚沼市浦佐4372-4", lat:37.150, lng:138.912,
+   hours:"10:00〜19:00 / 日曜定休(祝日は営業)(要確認)", price:"(要確認)", parking:"あり(店前に数台)", season:"通年", tags:["軽食","浦佐","グルメ"] },
  { id:"hakkaisan-ropeway", name:"八海山ロープウェー", genre:"自然", area:"六日町",
    desc:"標高1,778mの霊山・八海山の4合目まで一気に上がるロープウェー。山頂駅の展望台から魚沼盆地と越後三山の大パノラマが広がる。",
    niche:"秋の紅葉・雲海が有名だが、夏季のサンセット営業日の夕景も絶景。山岳信仰の史跡(里宮・城内口)巡りも通好み。",
@@ -2214,6 +2248,7 @@ function render(){
     </div>`).join("") || `<p style="color:var(--muted)">該当するスポットがありません。</p>`;
   $grid.querySelectorAll(".card").forEach(c => c.onclick = () => openDetail(c.dataset.id));
   $grid.querySelectorAll(".vztgl").forEach(b => b.onclick = (e) => { e.stopPropagation(); toggleMark(vzSet, b.dataset.vzid); render(); });
+  breadcrumbForFilter();
 }
 
 function openDetail(id){
@@ -2290,6 +2325,11 @@ function openDetail(id){
     </div>` : ""}
     <div id="gplaces"></div>`;
   $overlay.classList.add("open");
+  setBreadcrumb([
+    { label:"ホーム", onClick:goHome },
+    { label:s.genre, onClick:() => filterGenre(s.genre) },
+    { label:s.name }
+  ]);
   document.getElementById("mclose").onclick = closeDetail;
   $modal.querySelectorAll(".nb").forEach(n => n.onclick = () => openDetail(n.dataset.id));
   $modal.querySelectorAll(".addbtn").forEach(b => b.onclick = e => {
@@ -2459,6 +2499,11 @@ function openCourse(cid){
       <button class="btn btn-add" id="csetroute">➕ マイルートにセット</button>
     </div>`;
   $overlay.classList.add("open");
+  setBreadcrumb([
+    { label:"ホーム", onClick:goHome },
+    { label:"モデルコース", onClick:() => { closeDetail(); const sec=document.getElementById("courses-sec"); if(sec) sec.scrollIntoView({behavior:"smooth"}); } },
+    { label:c.title }
+  ]);
   document.getElementById("mclose").onclick = closeDetail;
   $modal.querySelectorAll(".cstep").forEach(el => el.onclick = () => openDetail(el.dataset.id));
   document.getElementById("csetroute").onclick = () => {
@@ -2470,7 +2515,7 @@ function openCourse(cid){
 document.getElementById("routeopt").onclick = optimizePlan;
 document.getElementById("routeclear").onclick = () => { plan = []; savePlan(); renderRoute(); };
 
-function closeDetail(){ $overlay.classList.remove("open"); }
+function closeDetail(){ $overlay.classList.remove("open"); breadcrumbForFilter(); }
 $overlay.addEventListener("click", e => { if (e.target === $overlay) closeDetail(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
 document.querySelector(".logo").onclick = e => { e.preventDefault(); closeDetail(); window.scrollTo({ top:0, behavior:"smooth" }); };
@@ -2728,13 +2773,20 @@ const HERO_GRAD = {
   "飲食":"linear-gradient(150deg,#b34e28,#e8734a)", "カフェ":"linear-gradient(150deg,#9a6f22,#c9973a)",
   "買物":"linear-gradient(150deg,#833f5b,#ad5f7d)"
 };
-var heroCur = 0;
+var heroCur = 0, heroCount = 0, heroTimer = null;
 function heroGo(i){
   const $hs = document.getElementById("heroslides"), $hd = document.getElementById("herodots");
   heroCur = i;
   Array.prototype.forEach.call($hs.children, (el,j) => el.classList.toggle("on", j===i));
   Array.prototype.forEach.call($hd.children, (el,j) => el.classList.toggle("on", j===i));
 }
+function heroStart(){
+  if (heroCount <= 1) return;
+  if (heroTimer) clearInterval(heroTimer);
+  heroTimer = setInterval(() => heroGo((heroCur+1) % heroCount), 5000);
+}
+function heroNext(){ if (heroCount > 1){ heroGo((heroCur+1) % heroCount); heroStart(); } }
+function heroPrev(){ if (heroCount > 1){ heroGo((heroCur-1+heroCount) % heroCount); heroStart(); } }
 (function(){
   const $hs = document.getElementById("heroslides"), $hd = document.getElementById("herodots");
   if (!$hs) return;
@@ -2755,10 +2807,19 @@ function heroGo(i){
     $hs.appendChild(d);
     const b = document.createElement("button");
     if (i===0) b.className = "on";
-    b.onclick = (e) => { e.stopPropagation(); heroGo(i); };
+    b.onclick = (e) => { e.stopPropagation(); heroGo(i); heroStart(); };
     $hd.appendChild(b);
   });
-  if (items.length > 1) setInterval(() => heroGo((heroCur+1) % items.length), 5000);
+  heroCount = items.length;
+  const $prev = document.getElementById("heroPrev"), $next = document.getElementById("heroNext");
+  if (heroCount > 1){
+    if ($prev) $prev.onclick = (e) => { e.stopPropagation(); heroPrev(); };
+    if ($next) $next.onclick = (e) => { e.stopPropagation(); heroNext(); };
+  } else {
+    if ($prev) $prev.style.display = "none";
+    if ($next) $next.style.display = "none";
+  }
+  heroStart();
 })();
 
 /* Pick up! カード */
@@ -2778,6 +2839,52 @@ const PICKUP_IDS = ["tabataya","yukiakari","satoya","sucre","sanaburi","keyakien
 
 initRank();
 loadPickupRecs();
+
+/* パンくずリスト & ナビ */
+function setBreadcrumb(items){
+  const bc = document.getElementById("breadcrumb");
+  if (!bc) return;
+  bc.innerHTML = items.map((it,i) => {
+    const sep = i>0 ? '<span class="sep">›</span>' : '';
+    if (i === items.length-1) return `${sep}<span class="current">${esc(it.label)}</span>`;
+    return `${sep}<a data-bc="${i}">${esc(it.label)}</a>`;
+  }).join(" ");
+  bc.querySelectorAll("[data-bc]").forEach(a => {
+    const idx = +a.dataset.bc;
+    if (items[idx] && items[idx].onClick) a.onclick = items[idx].onClick;
+  });
+}
+function goHome(){
+  activeGenre = "すべて"; keyword = "";
+  const qel = document.getElementById("q"); if (qel) qel.value = "";
+  closeDetail(); render();
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+function filterGenre(g){
+  activeGenre = g; keyword = "";
+  const qel = document.getElementById("q"); if (qel) qel.value = "";
+  closeDetail(); render();
+  const sec = document.getElementById("search"); if (sec) sec.scrollIntoView({ behavior:"smooth" });
+}
+function breadcrumbForFilter(){
+  if ($overlay.classList.contains("open")) return;
+  if (activeGenre === "すべて" && !keyword){ setBreadcrumb([{ label:"ホーム" }]); return; }
+  let cur = "スポット検索";
+  if (activeGenre !== "すべて") cur = activeGenre;
+  if (keyword) cur = `「${keyword}」`;
+  setBreadcrumb([{ label:"ホーム", onClick:goHome }, { label:cur }]);
+}
+breadcrumbForFilter();
+(function initNav(){
+  const ham = document.getElementById("hamburger");
+  const nav = document.getElementById("gnav");
+  const logo = document.getElementById("navLogo");
+  if (ham && nav){
+    ham.onclick = () => { const open = nav.classList.toggle("open"); ham.classList.toggle("open", open); ham.setAttribute("aria-expanded", open); };
+    nav.querySelectorAll("a").forEach(a => a.onclick = () => { nav.classList.remove("open"); ham.classList.remove("open"); ham.setAttribute("aria-expanded", false); });
+  }
+  if (logo) logo.onclick = (e) => { e.preventDefault(); goHome(); };
+})();
 
 </script>
 </body>
