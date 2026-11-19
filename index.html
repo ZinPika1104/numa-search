@@ -332,22 +332,16 @@ html { scroll-behavior:smooth; }
   .lg-chip .dot { width:10px; height:10px; border-radius:50%; }
   .lg-chip.off { opacity:.35; }
   .map-note { font-size:.72rem; color:var(--muted, #888); margin-top:6px; }
-  /* 地図のピン: .np.dot=小さな点 / .np.full=アイコン入りピン+名前(.lf で名前を左側) */
-  .np { width:0; height:0; }
-  .np > span { position:absolute; display:none; cursor:pointer; }
-  .np.dot .np-dot { display:block; left:-5px; top:-5px; width:10px; height:10px; border-radius:50%; border:1.5px solid #fff; box-sizing:border-box; box-shadow:0 0 2px rgba(0,0,0,.35); }
-  .np.full .np-pin { display:flex; align-items:center; justify-content:center; left:-14px; top:-35px; width:28px; height:28px; border-radius:50%; border:2px solid #fff; box-sizing:border-box; box-shadow:0 1px 4px rgba(0,0,0,.35); }
-  .np-pin::after { content:""; position:absolute; left:50%; bottom:-8px; transform:translateX(-50%); border:5px solid transparent; border-top:6px solid var(--c); }
-  .np-pin i { font-style:normal; font-size:14px; line-height:1; }
-  .np.full .np-label { display:block; top:-21px; left:17px; transform:translateY(-50%); width:max-content; max-width:9em; font-size:12.5px; font-weight:700; line-height:1.25;
-    text-shadow:0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 1px 1px 0 #fff, -1px -1px 0 #fff; }
-  .np.full.lf .np-label { left:auto; right:17px; text-align:right; }
+  .mapbox { position:relative; }
+  .mapstyle { position:absolute; top:10px; left:10px; z-index:2; display:flex; background:#fff; border-radius:999px; box-shadow:0 1px 4px rgba(0,0,0,.25); overflow:hidden; }
+  .mapstyle button { border:none; background:#fff; padding:6px 12px; font-size:.75rem; cursor:pointer; color:#555; }
+  .mapstyle button.on { background:var(--indigo); color:#fff; font-weight:600; }
+  .maplibregl-popup-content { border-radius:10px; padding:10px 14px; font-size:.85rem; line-height:1.5; }
   .map-detail { margin-top:6px; background:var(--indigo); color:#fff; border:none; border-radius:8px; padding:5px 12px; font-size:.78rem; cursor:pointer; }
+  .map-me { width:18px; height:18px; border-radius:50%; background:#2b6ef2; border:3px solid #fff; box-shadow:0 0 0 4px rgba(43,110,242,.25); box-sizing:border-box; }
   @media (max-width:600px){ #map { height:360px; } }
   </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css">
 </head>
 <body>
 
@@ -436,8 +430,11 @@ html { scroll-behavior:smooth; }
   <div class="sec-head"><span class="en">Map</span><h2>ぬまマップ — 全スポットを地図で見る</h2></div>
   <div class="mapwrap">
     <div class="maplegend" id="maplegend"></div>
-    <div id="map"></div>
-    <div class="map-note">凡例タップでジャンルの表示切替 / 拡大すると小さな点がピンと名前に変わります / ピンをタップ→「詳細を見る」でスポット情報。右上で「淡色・標準・写真」を切替。地図は国土地理院の地理院タイル(随時更新)。ピン位置は施設の位置、または住所の地区の中心(近似)です。</div>
+    <div class="mapbox">
+      <div id="map"></div>
+      <div class="mapstyle" id="mapstyle"></div>
+    </div>
+    <div class="map-note">凡例タップでジャンルの表示切替 / 数字の丸をタップすると拡大 / ピンをタップ→「詳細を見る」でスポット情報。左上で「標準・淡色・写真」を切替。地図は OpenFreeMap(OpenStreetMap)、写真は国土地理院。ピン位置は施設の位置、または住所の地区の中心(近似)です。</div>
   </div>
 </section>
 
@@ -520,8 +517,7 @@ html { scroll-behavior:smooth; }
 </footer>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js"></script>
 <script>
 /* ============================================================
    スポットデータ(ここを編集して追加・修正できます)
@@ -2712,11 +2708,88 @@ render();
 renderCourses();
 renderRoute();
 
-/* ============ ぬまマップ(ジャンル色分けピン・クラスター表示) ============ */
+/* ============ ぬまマップ(MapLibre GL + OpenFreeMap / ジャンル色分けピン・クラスター表示) ============ */
 const GENRE_COLORS = { "観光":"#e8a33d","自然":"#4c9a58","飲食":"#d95f43","カフェ":"#a9713a","温泉":"#3f7fb5","宿泊":"#7b5ea7","買物":"#5f7d8c","心霊":"#454c55" };
-let numaMap = null, mapCluster = null;
-const mapMarkers = {};
+const GENRE_ICONS = { "観光":"🏯", "自然":"🌲", "飲食":"🍴", "カフェ":"☕", "温泉":"♨️", "宿泊":"🛏️", "買物":"🛍️", "心霊":"👻" };
+/* 名前を出す優先度(小さいほど優先): ニッチ情報のある定番 → ジャンル順 */
+const LABEL_GENRE_RANK = { "観光":0, "自然":1, "温泉":2, "宿泊":3, "カフェ":4, "飲食":5, "買物":6, "心霊":7 };
+let numaMap = null, userMarker = null;
 const mapLegendState = {};
+Object.keys(GENRE_COLORS).forEach(g => { mapLegendState[g] = true; });
+
+/* 背景地図: OpenFreeMap(無料・APIキー不要)/ 写真のみ国土地理院 */
+const OFM_GLYPHS = "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf";
+const PIN_ATTR = 'ピン位置の一部 &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+const MAP_STYLES = {
+  "標準": "https://tiles.openfreemap.org/styles/liberty",
+  "淡色": "https://tiles.openfreemap.org/styles/positron",
+  "写真": { version:8, glyphs:OFM_GLYPHS,
+    sources:{ gsi:{ type:"raster", tileSize:256, maxzoom:18,
+      tiles:["https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"],
+      attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a>' } },
+    layers:[{ id:"gsi", type:"raster", source:"gsi" }] }
+};
+let mapStyleName = "標準";
+
+function spotGeoJSON(){
+  return { type:"FeatureCollection", features: SPOTS
+    .filter(s => s.lat && s.lng && mapLegendState[s.genre] !== false)
+    .map(s => ({ type:"Feature", geometry:{ type:"Point", coordinates:[s.lng, s.lat] },
+      properties:{ id:s.id, name:s.name, genre:s.genre, area:s.area || "",
+        rank:(s.niche ? 0 : 10) + (LABEL_GENRE_RANK[s.genre] ?? 9) } })) };
+}
+
+/* ジャンルごとのピン画像をcanvasで作る(絵文字入りの丸ピン) */
+function pinImage(color, icon){
+  const r = 2, w = 30 * r, h = 38 * r, c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const x = c.getContext("2d");
+  x.shadowColor = "rgba(0,0,0,.35)"; x.shadowBlur = 3 * r; x.shadowOffsetY = 1 * r;
+  x.fillStyle = color;
+  x.beginPath(); x.moveTo(w/2 - 6*r, 24*r); x.lineTo(w/2, 35*r); x.lineTo(w/2 + 6*r, 24*r); x.fill();
+  x.beginPath(); x.arc(w/2, 15*r, 13*r, 0, Math.PI*2); x.fill();
+  x.shadowColor = "transparent";
+  x.lineWidth = 2 * r; x.strokeStyle = "#fff"; x.stroke();
+  x.font = `${14*r}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  x.textAlign = "center"; x.textBaseline = "middle";
+  x.fillText(icon, w/2, 16*r);
+  return { image: x.getImageData(0, 0, w, h), pixelRatio: r };
+}
+
+/* 地図の地名を日本語表記にする(OpenFreeMapの既定はローマ字+日本語) */
+function japaneseLabels(){
+  numaMap.getStyle().layers.forEach(l => {
+    if (l.type !== "symbol" || !l.layout || !l.layout["text-field"]) return;
+    if (JSON.stringify(l.layout["text-field"]).indexOf("name") === -1) return;
+    numaMap.setLayoutProperty(l.id, "text-field", ["coalesce", ["get","name:ja"], ["get","name"]]);
+  });
+}
+
+function addSpotLayers(){
+  const m = numaMap;
+  if (m.getSource("spots")) return;
+  if (mapStyleName !== "写真") japaneseLabels();
+  Object.keys(GENRE_COLORS).forEach(g => {
+    const p = pinImage(GENRE_COLORS[g], GENRE_ICONS[g] || "📍");
+    if (!m.hasImage("pin-" + g)) m.addImage("pin-" + g, p.image, { pixelRatio:p.pixelRatio });
+  });
+  /* 近いピンは数字の丸にまとめる。ズーム13以上でバラける */
+  m.addSource("spots", { type:"geojson", data:spotGeoJSON(), cluster:true, clusterRadius:42, clusterMaxZoom:12 });
+  m.addLayer({ id:"spot-cluster", type:"circle", source:"spots", filter:["has","point_count"],
+    paint:{ "circle-color":"#218a99", "circle-opacity":.88, "circle-stroke-color":"#fff", "circle-stroke-width":2.5,
+      "circle-radius":["step",["get","point_count"], 15, 10, 19, 30, 24] } });
+  m.addLayer({ id:"spot-cluster-n", type:"symbol", source:"spots", filter:["has","point_count"],
+    layout:{ "text-field":["get","point_count_abbreviated"], "text-font":["Noto Sans Bold"], "text-size":13, "text-allow-overlap":true },
+    paint:{ "text-color":"#fff" } });
+  /* 1件ずつのピン。名前は重ならない所だけ表示(拡大すると増える) */
+  m.addLayer({ id:"spot-pin", type:"symbol", source:"spots", filter:["!", ["has","point_count"]],
+    layout:{ "icon-image":["concat","pin-",["get","genre"]], "icon-anchor":"bottom", "icon-allow-overlap":true,
+      "symbol-sort-key":["get","rank"],
+      "text-field":["get","name"], "text-font":["Noto Sans Bold"], "text-size":12.5, "text-max-width":9,
+      "text-variable-anchor":["left","right"], "text-radial-offset":1.3, "text-justify":"auto", "text-optional":true },
+    paint:{ "text-color":["match",["get","genre"], ...[].concat(...Object.entries(GENRE_COLORS)), "#555"],
+      "text-halo-color":"#fff", "text-halo-width":1.8 } });
+}
 
 function renderMapLegend(){
   const el = document.getElementById("maplegend");
@@ -2725,100 +2798,54 @@ function renderMapLegend(){
   el.querySelectorAll(".lg-chip").forEach(b => b.onclick = () => {
     const g = b.dataset.g;
     mapLegendState[g] = !mapLegendState[g];
-    mapLegendState[g] ? mapCluster.addLayers(mapMarkers[g]) : mapCluster.removeLayers(mapMarkers[g]);
+    const src = numaMap && numaMap.getSource("spots");
+    if (src) src.setData(spotGeoJSON());
     renderMapLegend();
-    scheduleDeclutter();
   });
 }
 
-/* ===== ピン表示(Googleマップ風) =====
-   名前を出せる場所があるスポットは「アイコン入りのピン+名前」、
-   ほかのピンの名前と重なってしまうスポットは「小さな点」で表示する。
-   拡大すると間隔が空くので、点だったスポットも順にピン+名前に変わる。 */
-const GENRE_ICONS = { "観光":"🏯", "自然":"🌲", "飲食":"🍴", "カフェ":"☕", "温泉":"♨️", "宿泊":"🛏️", "買物":"🛍️", "心霊":"👻" };
-const LABEL_GENRE_RANK = { "観光":0, "自然":1, "温泉":2, "宿泊":3, "カフェ":4, "飲食":5, "買物":6, "心霊":7 };
-let declutterTimer = null;
-function scheduleDeclutter(){
-  clearTimeout(declutterTimer);
-  declutterTimer = setTimeout(declutterLabels, 60);
-}
-function rectsHit(a, b){
-  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-}
-function spotIcon(s){
-  const color = GENRE_COLORS[s.genre] || "#666";
-  return L.divIcon({
-    className:"np dot", iconSize:[0,0], iconAnchor:[0,0], popupAnchor:[0,-30],
-    html:`<span class="np-dot" style="background:${color}"></span>` +
-         `<span class="np-pin" style="background:${color};--c:${color}"><i>${GENRE_ICONS[s.genre] || "📍"}</i></span>` +
-         `<span class="np-label" style="color:${color}">${esc(s.name)}</span>`
-  });
-}
-function setPinMode(m, mode){ /* mode: "dot" | "r"(名前を右) | "l"(名前を左) */
-  const el = m.getElement(); if (!el) return;
-  el.classList.toggle("dot", mode === "dot");
-  el.classList.toggle("full", mode !== "dot");
-  el.classList.toggle("lf", mode === "l");
-  m.setZIndexOffset(mode === "dot" ? 0 : 1000);
-}
-function declutterLabels(){
-  if (!numaMap) return;
-  const view = numaMap.getBounds().pad(0.1);
-  const shown = [];
-  Object.values(mapMarkers).forEach(arr => arr.forEach(m => {
-    if (!numaMap.hasLayer(m) || !m.getElement()) return;
-    if (view.contains(m.getLatLng())) shown.push(m); else setPinMode(m, "dot");
-  }));
-  /* 優先度: ニッチ情報のある定番スポット → ジャンル順 → 名前の短い順 */
-  shown.sort((a,b) =>
-    (b._spot.niche ? 1 : 0) - (a._spot.niche ? 1 : 0) ||
-    (LABEL_GENRE_RANK[a._spot.genre] ?? 9) - (LABEL_GENRE_RANK[b._spot.genre] ?? 9) ||
-    a._spot.name.length - b._spot.name.length);
-  const placed = [];
-  shown.forEach(m => {
-    const el = m.getElement();
-    for (const mode of ["r", "l"]){
-      setPinMode(m, mode);
-      const rs = [el.querySelector(".np-pin").getBoundingClientRect(), el.querySelector(".np-label").getBoundingClientRect()]
-        .map(r => ({ left:r.left-2, right:r.right+2, top:r.top-1, bottom:r.bottom+1 }));
-      if (!rs.some(r => placed.some(q => rectsHit(r, q)))){ placed.push(...rs); return; }
-    }
-    setPinMode(m, "dot");
+function renderMapStyleSwitch(){
+  const el = document.getElementById("mapstyle");
+  if (!el) return;
+  el.innerHTML = Object.keys(MAP_STYLES).map(k => `<button class="${k === mapStyleName ? "on" : ""}" data-k="${k}">${k}</button>`).join("");
+  el.querySelectorAll("button").forEach(b => b.onclick = () => {
+    if (b.dataset.k === mapStyleName) return;
+    mapStyleName = b.dataset.k;
+    numaMap.setStyle(MAP_STYLES[mapStyleName], { diff:false });
+    renderMapStyleSwitch();
   });
 }
 
 function initMap(){
-  if (numaMap || typeof L === "undefined" || !document.getElementById("map")) return;
-  numaMap = L.map("map", { scrollWheelZoom:false }).setView([37.045, 138.91], 11);
-  /* 背景地図: 国土地理院 地理院タイル(無料・APIキー不要・随時更新)。出典表示が利用条件 */
-  const GSI_ATTR = '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a> | ピン位置の一部 &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
-  const gsi = (id, ext, maxNative) => L.tileLayer(`https://cyberjapandata.gsi.go.jp/xyz/${id}/{z}/{x}/{y}.${ext}`,
-    { attribution:GSI_ATTR, maxNativeZoom:maxNative, maxZoom:18 });
-  const baseLayers = { "淡色地図":gsi("pale","png",18), "標準地図":gsi("std","png",18), "写真":gsi("seamlessphoto","jpg",18) };
-  baseLayers["淡色地図"].addTo(numaMap);
-  L.control.layers(baseLayers, null, { position:"topright" }).addTo(numaMap);
-
-  /* 近いピンは数字の丸にまとめる。ズーム13以上でバラける */
-  mapCluster = L.markerClusterGroup({ showCoverageOnHover:false, maxClusterRadius:48, disableClusteringAtZoom:13 });
-  numaMap.addLayer(mapCluster);
-
-  Object.keys(GENRE_COLORS).forEach(g => { mapMarkers[g] = []; mapLegendState[g] = true; });
-
-  SPOTS.forEach(s => {
-    if (!s.lat || !s.lng) return;
-    const color = GENRE_COLORS[s.genre] || "#666";
-    const m = L.marker([s.lat, s.lng], { icon:spotIcon(s), title:s.name, riseOnHover:true });
-    m._spot = s;
-    m.bindPopup(`<b>${esc(s.name)}</b><br><span style="color:${color};font-size:.78rem">${s.genre} / ${esc(s.area)}エリア</span><br><button class="map-detail" onclick="openDetail('${s.id}')">詳細を見る →</button>`);
-    (mapMarkers[s.genre] || mapMarkers["観光"]).push(m);
+  if (numaMap || typeof maplibregl === "undefined" || !document.getElementById("map")) return;
+  numaMap = new maplibregl.Map({
+    container:"map", style:MAP_STYLES[mapStyleName], center:[138.91, 37.045], zoom:10.3, maxZoom:18,
+    scrollZoom:false, dragRotate:false, pitchWithRotate:false,
+    attributionControl:{ compact:true, customAttribution:PIN_ATTR }
   });
-  mapCluster.addLayers([].concat(...Object.values(mapMarkers)));
+  numaMap.touchZoomRotate.disableRotation();
+  numaMap.addControl(new maplibregl.NavigationControl({ showCompass:false }), "top-right");
+  numaMap.on("style.load", addSpotLayers);
 
-  /* 表示が変わるたびに「ピン+名前」か「点」かを決め直す */
-  numaMap.on("zoomend moveend resize", scheduleDeclutter);
-  mapCluster.on("animationend", scheduleDeclutter);
+  numaMap.on("click", "spot-cluster", e => {
+    const f = e.features[0];
+    numaMap.getSource("spots").getClusterExpansionZoom(f.properties.cluster_id)
+      .then(z => numaMap.easeTo({ center:f.geometry.coordinates, zoom:z + 0.3 }));
+  });
+  numaMap.on("click", "spot-pin", e => {
+    const p = e.features[0].properties, color = GENRE_COLORS[p.genre] || "#666";
+    if (!/^[\w-]+$/.test(p.id)) return;
+    new maplibregl.Popup({ offset:[0,-34], maxWidth:"240px" }).setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<b>${esc(p.name)}</b><br><span style="color:${color};font-size:.78rem">${esc(p.genre)} / ${esc(p.area)}エリア</span><br><button class="map-detail" onclick="openDetail('${p.id}')">詳細を見る →</button>`)
+      .addTo(numaMap);
+  });
+  ["spot-cluster","spot-pin"].forEach(id => {
+    numaMap.on("mouseenter", id, () => { numaMap.getCanvas().style.cursor = "pointer"; });
+    numaMap.on("mouseleave", id, () => { numaMap.getCanvas().style.cursor = ""; });
+  });
 
   renderMapLegend();
+  renderMapStyleSwitch();
 }
 initMap();
 
@@ -2860,9 +2887,10 @@ document.querySelectorAll(".sortbtn").forEach(b => {
     navigator.geolocation.getCurrentPosition(p => {
       userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
       b.textContent = "📍 近い順";
-      if (numaMap && typeof L !== "undefined"){
-        L.circleMarker([userPos.lat, userPos.lng], { radius:9, color:"#fff", weight:2.5, fillColor:"#2b6ef2", fillOpacity:1 })
-          .bindTooltip("現在地").addTo(numaMap);
+      if (numaMap && typeof maplibregl !== "undefined"){
+        const el = document.createElement("div"); el.className = "map-me"; el.title = "現在地";
+        if (userMarker) userMarker.remove();
+        userMarker = new maplibregl.Marker({ element:el }).setLngLat([userPos.lng, userPos.lat]).addTo(numaMap);
       }
       setSort("near");
     }, () => {
