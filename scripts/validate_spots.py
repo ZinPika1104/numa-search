@@ -94,7 +94,7 @@ def extract_field_num(raw, key):
 
 def load_spots_array():
     html = INDEX_HTML.read_text(encoding="utf-8")
-    start_marker = "const SPOTS = ["
+    start_marker = "const ALL_SPOTS = ["
     start_idx = html.index(start_marker)
     arr_open = start_idx + len(start_marker) - 1
     arr_close = find_matching(html, arr_open, "[", "]")
