@@ -65,6 +65,7 @@
 3. 動作確認: ブラウザで index.html を開くだけ。コンソールエラーが無いこと、スポット件数表示が正しいこと
 4. 住所は 363件中332件が番地付き、31件が地区名のみ/山頂・エリア表記など(2026-11-16時点。validate_spots.py の「住所未補完」で一覧が出る)。Googleマップリンクは名前検索なので未補完でも動く
    - 住所・エリア・座標は `tools/address_edit.xlsx` で編集し `python3 tools/address_sheet.py apply` で index.html に反映できる(使い方はxlsxの「使い方」シート)。index.html を直接直したら `python3 tools/address_sheet.py export` でxlsxを作り直す
+   - **ピン位置の微調整は「位置調整モード」**: サイトを `?edit#numamap` 付きで開く → ピンをタップ「📍位置を直す」→ 赤いピンをドラッグ(または地図をタップ)→「📋 一覧をコピー」。コピーした文字を `tools/coord_edits.txt` に貼って `python3 tools/apply_coord_edits.py` で index.html に反映(xlsxも自動で作り直す)。直した内容はその端末の localStorage(numaCoordEdits)に保存され、通常URLでは何も表示されない。写真地図に切り替えると建物の入口に合わせやすい
    - 座標の妥当性は `python3 tools/check_coords.py` で確認(結果は tools/coord_check.csv。山頂など住所が粗いスポットは距離が大きく出ても誤りとは限らない)
    - 地図の出典表示(国土地理院・OpenStreetMap)を消さないこと。座標の一部は OpenStreetMap 由来
 5. 「五十沢温泉 ゆもとかん」の住所は情報源により宮394/宮17-4と揺れがある(現状は宮394)
