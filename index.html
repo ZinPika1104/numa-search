@@ -182,11 +182,18 @@
 
   /* モデルコース */
   .courses-title { max-width:960px; margin:20px auto 0; padding:0 16px; font-size:1rem; color:var(--indigo-dark); }
-  .courses { max-width:1100px; margin:0 auto; padding:0 0 6px; display:flex; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  .ccard { min-width:235px; max-width:235px; flex:0 0 auto; background:var(--card); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; cursor:pointer; transition:.15s; }
+  .courses { max-width:1100px; margin:0 auto; padding:0 0 6px; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+  .ccard { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; cursor:pointer; transition:.15s; }
   .ccard:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(20,52,63,.12); }
   .ccard h3 { font-size:.95rem; margin-bottom:4px; }
   .ccard p { font-size:.78rem; color:#4a5a63; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .ctypes { max-width:1100px; margin:0 auto 12px; display:flex; flex-wrap:wrap; gap:8px; }
+  .ccard .ctag { display:inline-block; font-size:.68rem; color:var(--indigo); background:#e6f3f5; border-radius:999px; padding:1px 8px; margin:0 4px 4px 0; }
+  .ccard .cmap { display:inline-block; margin-top:8px; font-size:.74rem; color:var(--indigo); text-decoration:underline; }
+  .btn-bigmap { display:block; width:100%; box-sizing:border-box; text-align:center; background:var(--indigo); color:#fff; font-weight:700; font-size:1rem; padding:14px 16px; border-radius:12px; text-decoration:none; margin:10px 0 4px; }
+  .cmap-sub { font-size:.74rem; color:var(--muted); margin-bottom:12px; }
+  .cmap-sub a { color:var(--indigo); }
+  .cstep-map { flex:0 0 auto; align-self:center; font-size:.72rem; color:var(--indigo); border:1px solid var(--indigo); border-radius:999px; padding:3px 10px; text-decoration:none; white-space:nowrap; }
   .ccard .cmeta { font-size:.72rem; color:var(--accent); margin-top:8px; }
   .cstep { display:flex; align-items:flex-start; gap:10px; border:1px solid var(--line); border-radius:10px; padding:10px 12px; cursor:pointer; transition:.15s; }
   .cstep:hover { background:#f4f8fa; }
@@ -322,35 +329,6 @@ html { scroll-behavior:smooth; }
 .vztgl.on{background:#e8f5ec;border-color:#4c9a58;color:#2e7d3e;font-weight:600}
 .rank-spot{cursor:pointer}
 </style>
-  <style>
-  /* ぬまマップ */
-  .map-title { max-width:1100px; margin:26px auto 0; padding:0 16px; font-size:1.05rem; color:var(--indigo); }
-  .mapwrap { max-width:1100px; margin:0 auto; padding:0; }
-  #map { height:440px; border-radius:14px; border:1px solid var(--line); z-index:1; }
-  .maplegend { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
-  .lg-chip { display:inline-flex; align-items:center; gap:5px; border:1px solid var(--line); background:#fff; border-radius:999px; padding:4px 11px; font-size:.78rem; cursor:pointer; transition:.15s; }
-  .lg-chip .dot { width:10px; height:10px; border-radius:50%; }
-  .lg-chip.off { opacity:.35; }
-  .map-note { font-size:.72rem; color:var(--muted, #888); margin-top:6px; }
-  .mapbox { position:relative; }
-  .mapstyle { position:absolute; top:10px; left:10px; z-index:2; display:flex; background:#fff; border-radius:999px; box-shadow:0 1px 4px rgba(0,0,0,.25); overflow:hidden; }
-  .mapstyle button { border:none; background:#fff; padding:6px 12px; font-size:.75rem; cursor:pointer; color:#555; }
-  .mapstyle button.on { background:var(--indigo); color:#fff; font-weight:600; }
-  .maplibregl-popup-content { border-radius:10px; padding:10px 14px; font-size:.85rem; line-height:1.5; }
-  .map-detail { margin-top:6px; background:var(--indigo); color:#fff; border:none; border-radius:8px; padding:5px 12px; font-size:.78rem; cursor:pointer; }
-  .map-me { width:18px; height:18px; border-radius:50%; background:#2b6ef2; border:3px solid #fff; box-shadow:0 0 0 4px rgba(43,110,242,.25); box-sizing:border-box; }
-  #mapedit { margin-top:10px; padding:12px 14px; border:2px dashed #e53935; border-radius:12px; background:#fff; font-size:.85rem; }
-  #mapedit .me-head { font-weight:700; color:#c62828; }
-  #mapedit .me-d { color:var(--muted, #888); font-size:.75rem; font-weight:400; }
-  #mapedit input { width:100%; box-sizing:border-box; margin:8px 0; padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:16px; }
-  #mapedit ul { margin:6px 0 10px; padding-left:1.2em; max-height:220px; overflow:auto; }
-  #mapedit li { margin:4px 0; }
-  #mapedit textarea { width:100%; height:120px; margin-top:8px; font-size:.75rem; }
-  .me-btn { border:1px solid var(--line); background:#fff; border-radius:8px; padding:4px 10px; font-size:.78rem; cursor:pointer; }
-  .me-btn.me-main { background:#e53935; color:#fff; border-color:#e53935; font-weight:600; padding:7px 14px; }
-  @media (max-width:600px){ #map { height:360px; } }
-  </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css">
 </head>
 <body>
 
@@ -359,10 +337,9 @@ html { scroll-behavior:smooth; }
     <a class="logo" href="#" id="navLogo">ぬま<span>サーチ</span></a>
     <button class="hamburger" id="hamburger" aria-label="メニュー" aria-expanded="false"><span></span><span></span><span></span></button>
     <nav class="gnav" id="gnav">
-      <a href="#search">スポット検索</a>
-      <a href="#ranking-sec">ランキング</a>
-      <a href="#numamap">マップ</a>
       <a href="#courses-sec">モデルコース</a>
+      <a href="#ranking-sec">ランキング</a>
+      <a href="#search">スポット検索</a>
       <a href="#seasons-sec">四季</a>
       <a href="#quiz-sec">クイズ</a>
       <a href="#souvenir-sec">お土産</a>
@@ -384,13 +361,19 @@ html { scroll-behavior:smooth; }
   <div class="hero-dots" id="herodots"></div>
 </div>
 
+<section class="sec" id="courses-sec">
+  <div class="sec-head"><span class="en">Model Course</span><h2>おすすめモデルコース</h2></div>
+  <div class="ctypes" id="ctypes"></div>
+  <div class="courses" id="courses"></div>
+</section>
+
 <section class="sec" id="pickup-sec">
   <div class="sec-head"><span class="en">Pick up!</span><h2>いま推したいスポット</h2></div>
   <div class="pickup" id="pickup"></div>
 </section>
 
 <section class="sec" id="ranking-sec">
-  <div class="sec-head"><span class="en">Ranking</span><h2>みんなのランキング</h2></div>
+  <div class="sec-head"><span class="en">Ranking</span><h2>みんなのランキング — コース以外にも、行ってみたい場所</h2></div>
   <div class="rankpanel">
     <div class="ranktabs">
       <button class="rtab on" data-rt="vz">🏆 制覇率</button>
@@ -433,23 +416,6 @@ html { scroll-behavior:smooth; }
     <div class="count" id="count"></div>
   </div>
   <div class="grid" id="grid"></div>
-</section>
-
-<section class="sec" id="numamap">
-  <div class="sec-head"><span class="en">Map</span><h2>ぬまマップ — 全スポットを地図で見る</h2></div>
-  <div class="mapwrap">
-    <div class="maplegend" id="maplegend"></div>
-    <div class="mapbox">
-      <div id="map"></div>
-      <div class="mapstyle" id="mapstyle"></div>
-    </div>
-    <div class="map-note">凡例タップでジャンルの表示切替 / 数字の丸をタップすると拡大 / ピンをタップ→「詳細を見る」でスポット情報。左上で「標準・淡色・写真」を切替。地図は OpenFreeMap(OpenStreetMap)、写真は国土地理院。ピン位置は施設の位置、または住所の地区の中心(近似)です。</div>
-  </div>
-</section>
-
-<section class="sec" id="courses-sec">
-  <div class="sec-head"><span class="en">Model Course</span><h2>おすすめモデルコース</h2></div>
-  <div class="courses" id="courses"></div>
 </section>
 
 <section class="sec" id="seasons-sec">
@@ -511,10 +477,9 @@ html { scroll-behavior:smooth; }
     <div class="flogo">ぬまサーチ</div>
     <div>新潟県南魚沼市の観光スポット検索アプリ — 定番からニッチまで363スポット</div>
     <nav class="fnav">
-      <a href="#search">スポット検索</a>
-      <a href="#ranking-sec">ランキング</a>
-      <a href="#numamap">マップ</a>
       <a href="#courses-sec">モデルコース</a>
+      <a href="#ranking-sec">ランキング</a>
+      <a href="#search">スポット検索</a>
       <a href="#seasons-sec">四季</a>
       <a href="#quiz-sec">クイズ</a>
       <a href="#souvenir-sec">お土産</a>
@@ -526,7 +491,6 @@ html { scroll-behavior:smooth; }
 </footer>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js"></script>
 <script>
 /* ============================================================
    スポットデータ(ここを編集して追加・修正できます)
@@ -1757,35 +1721,91 @@ const GOOGLE_MAPS_API_KEY = "";
    spots: SPOTS配列のidを回る順に並べる
 ============================================================ */
 const COURSES = [
- { id:"oudou", title:"王道☆南魚沼1日コース", season:"夏〜秋", duration:"約8時間",
+ { id:"oudou", types:["はじめて", "絶景・自然", "グルメ"], title:"王道☆南魚沼1日コース", season:"夏〜秋", duration:"約8時間",
    catch:"初めての南魚沼はこれ。名刹・絶景・そば・地酒・温泉を1日で。",
    tip:"八海山ロープウェーは午前中のほうが晴天率が高め。魚沼の里の菓子処さとやは人気商品が夕方前に売り切れることも。",
    spots:["untouan","hakkaisan-ropeway","nagamori-soba","uonuma-no-sato","sarukurayama-beer","muikamachi-onsen"] },
 
- { id:"shiozawa", title:"塩沢・雪国歴史さんぽ", season:"通年", duration:"約4〜5時間",
+ { id:"shiozawa", types:["はじめて", "半日"], title:"塩沢・雪国歴史さんぽ", season:"通年", duration:"約4〜5時間",
    catch:"三国街道の宿場町で『北越雪譜』の世界へ。半日でも大満足。",
    tip:"牧之通りは午前の光が写真向き。田畑屋のへぎそばは昼時に混むので11時台の到着が吉。",
    spots:["bokushi-dori","bokushi-museum","tabataya","osawayama-onsen"] },
 
- { id:"nature", title:"絶景・自然ドライブ", season:"春〜秋", duration:"約6時間",
+ { id:"nature", types:["絶景・自然"], title:"絶景・自然ドライブ", season:"春〜秋", duration:"約6時間",
    catch:"雲海のスカイラインから秘境渓谷、古民家ランチ、洞窟風呂まで。",
    tip:"魚沼スカイラインは早朝の雲海が狙い目。裏巻機渓谷は開通期間・ゲート時間を事前確認。欅苑は予約制。",
    spots:["uonuma-skyline","keyakien","gojyasawa-keikoku","ikazawa-onsen"] },
 
- { id:"gourmet", title:"南魚沼グルメ満腹コース", season:"通年", duration:"1日",
+ { id:"gourmet", types:["グルメ"], title:"南魚沼グルメ満腹コース", season:"通年", duration:"1日",
    catch:"コシヒカリおにぎりに始まり、ラーメン、スイーツ、夜は焼鳥まで。",
    tip:"倉友農園のおにぎりは朝イチ、まずは塩むすび。焼鳥ひじりは夜の予約推奨。",
    spots:["sokyu-onigiri","mendokoro-shimizu","sucre","yummy","hijiri"] },
 
- { id:"yamato", title:"浦佐・大和 アートと名刹", season:"通年", duration:"約5時間",
+ { id:"yamato", types:["半日"], title:"浦佐・大和 アートと名刹", season:"通年", duration:"約5時間",
    catch:"日本三大奇祭の寺と2つの美術館、へぎそばの老舗を巡る。",
    tip:"トミオカホワイト美術館と池田記念美術館は浦佐駅からセットで回りやすい。締めは八色の森公園の夕方散歩。",
    spots:["bishamondo","miyanoya","tomioka-white","ikeda-museum","yairo-park"] },
 
- { id:"winter", title:"冬の雪国満喫コース", season:"冬", duration:"1日",
+ { id:"winter", types:["冬"], title:"冬の雪国満喫コース", season:"冬", duration:"1日",
    catch:"日本屈指の雪質で滑って、背脂ラーメンで温まって、温泉で締める。",
    tip:"石打丸山はナイターも人気。滑走後のヒグマの背脂ラーメンが沁みる。冬道運転はスタッドレス必須。",
    spots:["ishiuchi-maruyama","higuma-shiozawa","muikamachi-onsen"] },
+
+ /* ---- ここから追加コース(types=絞り込みタブ。内容は地元目線で直してください) ---- */
+ { id:"rainy", types:["雨の日","はじめて","半日"], title:"雨でも楽しい 屋内めぐり", season:"通年", duration:"約5時間",
+   catch:"つむぎ・美術・そば・温泉。天気に左右されない塩沢〜六日町の屋内コース。",
+   tip:"施設の休館日・開館時間は変わることがあるので出発前に確認を(要確認)。道の駅でお土産を買って、締めは温泉で温まる流れ。",
+   spots:["tsumugi-kinenkan","bokushi-museum","tabataya","imaizumi-art","shikiajiwaikan","muikamachi-onsen"] },
+
+ { id:"ashiyu", types:["温泉・癒し","半日"], title:"足湯と温泉でほっこりコース", season:"通年", duration:"約3〜4時間",
+   catch:"六日町の街なか足湯3か所をはしごして、最後はしっかり温泉へ。",
+   tip:"足湯はタオルを持参すると便利。利用時間・冬季の休止は要確認。五十沢温泉は少し山側なので締めの1湯に。",
+   spots:["ov92","ov94","ov93","muikamachi-onsen","ikazawa-onsen"] },
+
+ { id:"sake", types:["通好み","グルメ"], title:"地酒・クラフトビール めぐり", season:"通年", duration:"約4〜5時間",
+   catch:"八海山の社員食堂から、地ビール、酒屋巡りまで。米どころ・酒どころの味を。",
+   tip:"運転する人は試飲できません。飲む人と運転する人を分けるか、公共交通・タクシーの利用を。各店の営業時間・定休日は要確認。",
+   spots:["hakkaisan-shokudo","sarukurayama-beer","kinjo-shuhan","ov29","ov23"] },
+
+ { id:"sweets", types:["グルメ","半日"], title:"六日町 スイーツ&パン さんぽ", season:"通年", duration:"約3〜4時間",
+   catch:"シフォン、ベーカリー、パティスリー。甘いものだけで巡る半日コース。",
+   tip:"人気商品は午後に売り切れることがあるので、パン屋さんは早めの時間帯に。定休日は要確認。",
+   spots:["ov13","gm10","gm7","satoya","sucre"] },
+
+ { id:"yamato-oishii", types:["グルメ","半日"], title:"大和・おいしい寄り道", season:"通年", duration:"約4時間",
+   catch:"八海そばでお昼、ワイナリー、ジェラート、直売所。大和エリアのおいしいもの巡り。",
+   tip:"ワイナリーや直売所は営業日・時間が限られることがあるので事前確認を(要確認)。ジェラートは締めに。",
+   spots:["gm73","ov26","agripark-yairo","yummy"] },
+
+ { id:"ramen", types:["通好み","グルメ"], title:"南魚沼ラーメンはしごコース", season:"通年", duration:"約4時間",
+   catch:"六日町の人気店から塩沢の背脂・生姜醤油まで。食べ比べて自分の一杯を探す。",
+   tip:"全部は食べ過ぎになるので2〜3軒に絞るのがおすすめ。昼のみ営業・売切れ終了の店もあるので営業時間は要確認。",
+   spots:["gm22","okuemon","mendokoro-shimizu","higuma-shiozawa","ichihachi"] },
+
+ { id:"hike", types:["絶景・自然","通好み"], title:"ご近所ハイク&温泉", season:"春〜秋", duration:"約6時間",
+   catch:"六日町の里山を歩いて、最後は温泉で汗を流す。登山の入門に。",
+   tip:"登山は天候・装備・日没時間の確認を。山のコンディションは要確認。下山後の温泉はタオルと着替えを忘れずに。",
+   spots:["sakadoyama","ov49","ov56","muikamachi-onsen"] },
+
+ { id:"lake", types:["絶景・自然","半日"], title:"湖と渓谷のんびりドライブ", season:"春〜秋", duration:"約4時間",
+   catch:"しゃくなげ湖から十字峡、お松の池へ。水辺の景色をつなぐドライブ。",
+   tip:"山間部の道路は開通期間・通行止めを事前に確認(要確認)。しゃくなげ観光センターで一息つくのがおすすめ。",
+   spots:["shakunage-lake","gm28","ov68","ov60"] },
+
+ { id:"temples", types:["通好み","半日"], title:"寺社と歴史のひとめぐり", season:"通年", duration:"約4〜5時間",
+   catch:"雲洞庵から直江兼続ゆかりの地、関興寺まで。雪国の歴史をたどる。",
+   tip:"雲洞庵は『天地人』ゆかりの名刹。拝観時間は要確認。冬は雪で足元が悪いので滑りにくい靴で。",
+   spots:["untouan","ov70","ov66","kankouji","ov41","ov74"] },
+
+ { id:"park", types:["のんびり","半日"], title:"公園とおやつ ゆったり半日", season:"春〜秋", duration:"約3〜4時間",
+   catch:"公園を散歩して、道の駅でお買い物。小さな子ども連れにも。",
+   tip:"夏は日陰が少ない所もあるので帽子と飲み物を。トイレの場所と営業時間は事前に確認を(要確認)。",
+   spots:["zenibuchi-park","shikiajiwaikan","ov43","ov71"] },
+
+ { id:"shokudo", types:["通好み","グルメ"], title:"地元の食堂めぐり", season:"通年", duration:"約3時間",
+   catch:"観光ガイドにあまり出ない、昔ながらの食堂を巡る。地元の人が通う味に出会う。",
+   tip:"昼のみ営業・不定休の店が多いので営業時間は要確認。混む時間帯を外すと入りやすい。現金のみの店もあるかも。",
+   spots:["gm109","gm80","gm137","gm70"] },
 ];
 
 /* スポット一覧はジャンルのタブで切り替える(「すべて」タブは無し)。
@@ -2483,12 +2503,14 @@ function optimizePlan(){
 }
 
 /* 現在地→経由地→最終地点 のGoogleマップURL(経由地は最大9か所) */
-function routeGmapsUrl(spotsArr){
+function routeGmapsUrl(spotsArr, fromFirst){
   const sp = (spotsArr || planSpots()).slice(0, 10);
   if (!sp.length) return "#";
   const pt = s => s.lat + "," + s.lng;
   let u = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(pt(sp[sp.length-1])) + "&travelmode=driving";
-  const way = sp.slice(0, -1);
+  /* fromFirst: 現在地ではなく最初のスポットを出発地にする(家のPCでルートを確認したいとき用) */
+  if (fromFirst && sp.length > 1) u += "&origin=" + encodeURIComponent(pt(sp[0]));
+  const way = sp.slice(fromFirst && sp.length > 1 ? 1 : 0, -1);
   if (way.length) u += "&waypoints=" + encodeURIComponent(way.map(pt).join("|"));
   return u;
 }
@@ -2515,12 +2537,20 @@ function renderRoute(){
 /* ---- モデルコース ---- */
 function courseSpots(c){ return c.spots.map(id => SPOTS.find(s => s.id === id)).filter(Boolean); }
 
+let courseType = "";
 function renderCourses(){
-  document.getElementById("courses").innerHTML = COURSES.map(c => `
+  const types = []; COURSES.forEach(c => (c.types || []).forEach(t => { if (!types.includes(t)) types.push(t); }));
+  const tb = document.getElementById("ctypes");
+  tb.innerHTML = [""].concat(types).map(t =>
+    `<button class="chip${t === courseType ? " active" : ""}" data-t="${esc(t)}">${t ? esc(t) : "すべて"}<span class="chip-n">${t ? COURSES.filter(c => (c.types||[]).includes(t)).length : COURSES.length}</span></button>`).join("");
+  tb.querySelectorAll(".chip").forEach(b => b.onclick = () => { courseType = b.dataset.t; renderCourses(); });
+  document.getElementById("courses").innerHTML = COURSES.filter(c => !courseType || (c.types || []).includes(courseType)).map(c => `
     <div class="ccard" data-cid="${c.id}">
       <h3>${esc(c.title)}</h3>
+      <div>${(c.types || []).map(t => `<span class="ctag">${esc(t)}</span>`).join("")}</div>
       <p>${esc(c.catch)}</p>
       <div class="cmeta">${courseSpots(c).length}スポット ・ ${esc(c.duration)} ・ ${esc(c.season)}</div>
+      <a class="cmap" href="${routeGmapsUrl(courseSpots(c))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺 Googleマップでルートを見る ↗</a>
     </div>`).join("");
   document.querySelectorAll(".ccard").forEach(el => el.onclick = () => openCourse(el.dataset.cid));
 }
@@ -2543,6 +2573,7 @@ function openCourse(cid){
           <div class="nb-name"><span class="badge g-${s.genre}">${s.genre}</span> ${esc(s.name)}</div>
           <div class="nb-dist">${esc(s.area)}エリア ・ ${esc(s.address)}</div>
         </div>
+        <a class="cstep-map" href="${mapPlaceUrl(s)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">地図 ↗</a>
       </div>`;
   }).join("");
 
@@ -2551,10 +2582,11 @@ function openCourse(cid){
     <h2>🗺 ${esc(c.title)}</h2>
     <p class="sub">${esc(c.duration)} ・ ベストシーズン: ${esc(c.season)} ・ 移動合計 約${total.toFixed(1)}km / 車で約${driveMin(total)}分(目安)</p>
     <p class="desc">${esc(c.catch)}</p>
+    <a class="btn-bigmap" href="${routeGmapsUrl(sp)}" target="_blank" rel="noopener">🚗 Googleマップでこのコースのルートを開く</a>
+    <div class="cmap-sub">出発地はGoogleマップ側で「現在地」になります。<a href="${routeGmapsUrl(sp, true)}" target="_blank" rel="noopener">最初のスポットを出発地にして開く</a></div>
     <div class="niche"><b>💡 コースのコツ</b>${esc(c.tip)}</div>
     <div class="nearby">${rows}</div>
     <div class="btns" style="margin-top:16px">
-      <a class="btn btn-map" href="${routeGmapsUrl(sp)}" target="_blank" rel="noopener">🚗 現在地からこのコースのルートを開く</a>
       <button class="btn btn-add" id="csetroute">➕ マイルートにセット</button>
     </div>`;
   $overlay.classList.add("open");
@@ -2717,257 +2749,6 @@ render();
 renderCourses();
 renderRoute();
 
-/* ============ ぬまマップ(MapLibre GL + OpenFreeMap / ジャンル色分けピン・クラスター表示) ============ */
-const GENRE_COLORS = { "観光":"#e8a33d","自然":"#4c9a58","飲食":"#d95f43","カフェ":"#a9713a","温泉":"#3f7fb5","宿泊":"#7b5ea7","買物":"#5f7d8c","心霊":"#454c55" };
-const GENRE_ICONS = { "観光":"🏯", "自然":"🌲", "飲食":"🍴", "カフェ":"☕", "温泉":"♨️", "宿泊":"🛏️", "買物":"🛍️", "心霊":"👻" };
-/* 名前を出す優先度(小さいほど優先): ニッチ情報のある定番 → ジャンル順 */
-const LABEL_GENRE_RANK = { "観光":0, "自然":1, "温泉":2, "宿泊":3, "カフェ":4, "飲食":5, "買物":6, "心霊":7 };
-let numaMap = null, userMarker = null;
-const mapLegendState = {};
-Object.keys(GENRE_COLORS).forEach(g => { mapLegendState[g] = true; });
-
-/* 背景地図: OpenFreeMap(無料・APIキー不要)/ 写真のみ国土地理院 */
-const OFM_GLYPHS = "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf";
-const PIN_ATTR = 'ピン位置の一部 &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
-const MAP_STYLES = {
-  "標準": "https://tiles.openfreemap.org/styles/liberty",
-  "淡色": "https://tiles.openfreemap.org/styles/positron",
-  "写真": { version:8, glyphs:OFM_GLYPHS,
-    sources:{ gsi:{ type:"raster", tileSize:256, maxzoom:18,
-      tiles:["https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"],
-      attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a>' } },
-    layers:[{ id:"gsi", type:"raster", source:"gsi" }] }
-};
-let mapStyleName = "標準";
-
-function spotGeoJSON(){
-  return { type:"FeatureCollection", features: SPOTS
-    .filter(s => s.lat && s.lng && mapLegendState[s.genre] !== false)
-    .map(s => ({ type:"Feature", geometry:{ type:"Point", coordinates:[s.lng, s.lat] },
-      properties:{ id:s.id, name:s.name, genre:s.genre, area:s.area || "",
-        rank:(s.niche ? 0 : 10) + (LABEL_GENRE_RANK[s.genre] ?? 9) } })) };
-}
-
-/* ジャンルごとのピン画像をcanvasで作る(絵文字入りの丸ピン) */
-function pinImage(color, icon){
-  const r = 2, w = 30 * r, h = 38 * r, c = document.createElement("canvas");
-  c.width = w; c.height = h;
-  const x = c.getContext("2d");
-  x.shadowColor = "rgba(0,0,0,.35)"; x.shadowBlur = 3 * r; x.shadowOffsetY = 1 * r;
-  x.fillStyle = color;
-  x.beginPath(); x.moveTo(w/2 - 6*r, 24*r); x.lineTo(w/2, 35*r); x.lineTo(w/2 + 6*r, 24*r); x.fill();
-  x.beginPath(); x.arc(w/2, 15*r, 13*r, 0, Math.PI*2); x.fill();
-  x.shadowColor = "transparent";
-  x.lineWidth = 2 * r; x.strokeStyle = "#fff"; x.stroke();
-  x.font = `${14*r}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
-  x.textAlign = "center"; x.textBaseline = "middle";
-  x.fillText(icon, w/2, 16*r);
-  return { image: x.getImageData(0, 0, w, h), pixelRatio: r };
-}
-
-/* 地図の地名を日本語表記にする(OpenFreeMapの既定はローマ字+日本語) */
-function japaneseLabels(){
-  numaMap.getStyle().layers.forEach(l => {
-    if (l.type !== "symbol" || !l.layout || !l.layout["text-field"]) return;
-    if (JSON.stringify(l.layout["text-field"]).indexOf("name") === -1) return;
-    numaMap.setLayoutProperty(l.id, "text-field", ["coalesce", ["get","name:ja"], ["get","name"]]);
-  });
-}
-
-function addSpotLayers(){
-  const m = numaMap;
-  if (m.getSource("spots")) return;
-  if (mapStyleName !== "写真") japaneseLabels();
-  Object.keys(GENRE_COLORS).forEach(g => {
-    const p = pinImage(GENRE_COLORS[g], GENRE_ICONS[g] || "📍");
-    if (!m.hasImage("pin-" + g)) m.addImage("pin-" + g, p.image, { pixelRatio:p.pixelRatio });
-  });
-  /* 近いピンは数字の丸にまとめる。ズーム13以上でバラける */
-  m.addSource("spots", { type:"geojson", data:spotGeoJSON(), cluster:!MAP_EDIT, clusterRadius:42, clusterMaxZoom:12 });
-  m.addLayer({ id:"spot-cluster", type:"circle", source:"spots", filter:["has","point_count"],
-    paint:{ "circle-color":"#218a99", "circle-opacity":.88, "circle-stroke-color":"#fff", "circle-stroke-width":2.5,
-      "circle-radius":["step",["get","point_count"], 15, 10, 19, 30, 24] } });
-  m.addLayer({ id:"spot-cluster-n", type:"symbol", source:"spots", filter:["has","point_count"],
-    layout:{ "text-field":["get","point_count_abbreviated"], "text-font":["Noto Sans Bold"], "text-size":13, "text-allow-overlap":true },
-    paint:{ "text-color":"#fff" } });
-  /* 1件ずつのピン。名前は重ならない所だけ表示(拡大すると増える) */
-  m.addLayer({ id:"spot-pin", type:"symbol", source:"spots", filter:["!", ["has","point_count"]],
-    layout:{ "icon-image":["concat","pin-",["get","genre"]], "icon-anchor":"bottom", "icon-allow-overlap":true,
-      "symbol-sort-key":["get","rank"],
-      "text-field":["get","name"], "text-font":["Noto Sans Bold"], "text-size":12.5, "text-max-width":9,
-      "text-variable-anchor":["left","right"], "text-radial-offset":1.3, "text-justify":"auto", "text-optional":true },
-    paint:{ "text-color":["match",["get","genre"], ...[].concat(...Object.entries(GENRE_COLORS)), "#555"],
-      "text-halo-color":"#fff", "text-halo-width":1.8 } });
-  if (MAP_EDIT) editPinFilter();
-}
-
-function renderMapLegend(){
-  const el = document.getElementById("maplegend");
-  el.innerHTML = GENRES.map(g =>
-    `<button class="lg-chip ${mapLegendState[g] ? "" : "off"}" data-g="${g}"><span class="dot" style="background:${GENRE_COLORS[g]}"></span>${g}</button>`).join("");
-  el.querySelectorAll(".lg-chip").forEach(b => b.onclick = () => {
-    const g = b.dataset.g;
-    mapLegendState[g] = !mapLegendState[g];
-    const src = numaMap && numaMap.getSource("spots");
-    if (src) src.setData(spotGeoJSON());
-    renderMapLegend();
-  });
-}
-
-function renderMapStyleSwitch(){
-  const el = document.getElementById("mapstyle");
-  if (!el) return;
-  el.innerHTML = Object.keys(MAP_STYLES).map(k => `<button class="${k === mapStyleName ? "on" : ""}" data-k="${k}">${k}</button>`).join("");
-  el.querySelectorAll("button").forEach(b => b.onclick = () => {
-    if (b.dataset.k === mapStyleName) return;
-    mapStyleName = b.dataset.k;
-    numaMap.setStyle(MAP_STYLES[mapStyleName], { diff:false });
-    renderMapStyleSwitch();
-  });
-}
-
-function initMap(){
-  if (numaMap || typeof maplibregl === "undefined" || !document.getElementById("map")) return;
-  numaMap = new maplibregl.Map({
-    container:"map", style:MAP_STYLES[mapStyleName], center:[138.91, 37.045], zoom:10.3, maxZoom:18,
-    scrollZoom:false, dragRotate:false, pitchWithRotate:false,
-    attributionControl:{ compact:true, customAttribution:PIN_ATTR }
-  });
-  numaMap.touchZoomRotate.disableRotation();
-  numaMap.addControl(new maplibregl.NavigationControl({ showCompass:false }), "top-right");
-  numaMap.on("style.load", addSpotLayers);
-
-  numaMap.on("click", "spot-cluster", e => {
-    const f = e.features[0];
-    numaMap.getSource("spots").getClusterExpansionZoom(f.properties.cluster_id)
-      .then(z => numaMap.easeTo({ center:f.geometry.coordinates, zoom:z + 0.3 }));
-  });
-  numaMap.on("click", "spot-pin", e => {
-    const p = e.features[0].properties, color = GENRE_COLORS[p.genre] || "#666";
-    if (!/^[\w-]+$/.test(p.id)) return;
-    new maplibregl.Popup({ offset:[0,-34], maxWidth:"240px" }).setLngLat(e.features[0].geometry.coordinates)
-      .setHTML(`<b>${esc(p.name)}</b><br><span style="color:${color};font-size:.78rem">${esc(p.genre)} / ${esc(p.area)}エリア</span><br><button class="map-detail" onclick="openDetail('${p.id}')">詳細を見る →</button>` +
-        (MAP_EDIT ? ` <button class="map-detail" style="background:#e53935" onclick="editSelect('${p.id}')">📍位置を直す</button>` : ""))
-      .addTo(numaMap);
-  });
-  /* 位置調整モード: 選択中に地図をタップすると、そこへピンを移動 */
-  numaMap.on("click", e => {
-    if (!MAP_EDIT || !editSel) return;
-    if (numaMap.queryRenderedFeatures(e.point, { layers:["spot-pin"] }).length) return;
-    editMarker.setLngLat(e.lngLat);
-    editSetCoord(editSel, e.lngLat);
-  });
-  ["spot-cluster","spot-pin"].forEach(id => {
-    numaMap.on("mouseenter", id, () => { numaMap.getCanvas().style.cursor = "pointer"; });
-    numaMap.on("mouseleave", id, () => { numaMap.getCanvas().style.cursor = ""; });
-  });
-
-  renderMapLegend();
-  renderMapStyleSwitch();
-  if (MAP_EDIT) initMapEdit();
-}
-
-/* ============ 位置調整モード(URLに ?edit を付けたときだけ) ============
-   ピンをドラッグ(または地図をタップ)して座標を直し、一覧をコピーして
-   tools/apply_coord_edits.py で index.html に反映する。利用者には表示されない。 */
-const MAP_EDIT = typeof location !== "undefined" && /[?&]edit\b/.test(location.search);
-const EDIT_KEY = "numaCoordEdits";
-let editSel = null, editMarker = null, coordEdits = {};
-const spotById = id => SPOTS.find(s => s.id === id);
-
-function editSave(){ try { localStorage.setItem(EDIT_KEY, JSON.stringify(coordEdits)); } catch(e){} }
-function editPinFilter(){
-  if (numaMap && numaMap.getLayer("spot-pin"))
-    numaMap.setFilter("spot-pin", ["all", ["!", ["has","point_count"]], ["!=", ["get","id"], editSel || ""]]);
-}
-function editRefresh(){
-  const src = numaMap && numaMap.getSource("spots");
-  if (src) src.setData(spotGeoJSON());
-  editPinFilter();
-  renderMapEdit();
-}
-function editSelect(id){
-  const s = spotById(id); if (!s) return;
-  document.querySelectorAll(".maplibregl-popup").forEach(p => p.remove());
-  editSel = id;
-  if (!editMarker){
-    editMarker = new maplibregl.Marker({ color:"#e53935", draggable:true });
-    editMarker.on("dragend", () => editSetCoord(editSel, editMarker.getLngLat()));
-  }
-  editMarker.setLngLat([s.lng, s.lat]).addTo(numaMap);
-  numaMap.easeTo({ center:[s.lng, s.lat], zoom:Math.max(numaMap.getZoom(), 16.5) });
-  editRefresh();
-}
-function editDone(){
-  editSel = null;
-  if (editMarker) editMarker.remove();
-  editRefresh();
-}
-function editSetCoord(id, ll){
-  const s = spotById(id); if (!s) return;
-  if (!coordEdits[id]) coordEdits[id] = { olat:s.lat, olng:s.lng };
-  s.lat = +ll.lat.toFixed(6); s.lng = +ll.lng.toFixed(6);
-  Object.assign(coordEdits[id], { lat:s.lat, lng:s.lng });
-  editSave(); editRefresh();
-}
-function editUndo(id){
-  const e = coordEdits[id], s = spotById(id); if (!e || !s) return;
-  s.lat = e.olat; s.lng = e.olng;
-  delete coordEdits[id]; editSave();
-  if (editSel === id && editMarker) editMarker.setLngLat([s.lng, s.lat]);
-  editRefresh();
-}
-function editText(){
-  return Object.keys(coordEdits).map(id => `${id}\t${coordEdits[id].lat}\t${coordEdits[id].lng}\t# ${(spotById(id) || {}).name || ""}`).join("\n");
-}
-function editCopy(){
-  const t = editText(), msg = document.getElementById("me-msg");
-  if (!t){ msg.textContent = "まだ直したスポットがありません"; return; }
-  const done = () => { msg.textContent = `${Object.keys(coordEdits).length}件をコピーしました。Claudeに貼って「反映して」と送ってください`; };
-  const fallback = () => { const ta = document.getElementById("me-text"); ta.style.display = "block"; ta.value = t; ta.select(); try { document.execCommand("copy"); done(); } catch(e){ msg.textContent = "下の枠の文字を手でコピーしてください"; } };
-  navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t).then(done, fallback) : fallback();
-}
-function editClear(){
-  if (!confirm("直した位置をすべて元に戻しますか?")) return;
-  Object.keys(coordEdits).forEach(editUndo);
-}
-function renderMapEdit(){
-  const box = document.getElementById("mapedit"); if (!box) return;
-  const s = editSel && spotById(editSel), ids = Object.keys(coordEdits);
-  document.getElementById("me-sel").innerHTML = s
-    ? `選択中: <b>${esc(s.name)}</b> — 赤いピンをドラッグするか、地図をタップして移動 <button class="me-btn" onclick="editDone()">完了</button>`
-    : "ピンをタップ →「📍位置を直す」、または上の欄でスポットを検索";
-  document.getElementById("me-list").innerHTML = ids.length ? ids.map(id => {
-    const e = coordEdits[id], sp = spotById(id) || { name:id };
-    const m = Math.round(distKm({ lat:e.olat, lng:e.olng }, { lat:e.lat, lng:e.lng }) * 1000);
-    return `<li><a href="javascript:void 0" onclick="editSelect('${id}')">${esc(sp.name)}</a> <span class="me-d">${m}m 移動</span> <button class="me-btn" onclick="editUndo('${id}')">戻す</button></li>`;
-  }).join("") : `<li class="me-d">まだありません</li>`;
-  document.getElementById("me-count").textContent = ids.length;
-}
-function initMapEdit(){
-  try { coordEdits = JSON.parse(localStorage.getItem(EDIT_KEY) || "{}") || {}; } catch(e){ coordEdits = {}; }
-  Object.keys(coordEdits).forEach(id => { const s = spotById(id); if (s){ s.lat = coordEdits[id].lat; s.lng = coordEdits[id].lng; } else delete coordEdits[id]; });
-  const box = document.createElement("div");
-  box.id = "mapedit";
-  box.innerHTML = `
-    <div class="me-head">📍 位置調整モード <span class="me-d">(このURLを知っている人だけに表示。直した内容はこの端末に保存されます)</span></div>
-    <input id="me-search" list="me-names" placeholder="スポット名で探す">
-    <datalist id="me-names">${SPOTS.map(s => `<option value="${esc(s.name)}">`).join("")}</datalist>
-    <div id="me-sel"></div>
-    <div class="me-head" style="margin-top:10px">直したスポット(<span id="me-count">0</span>件)</div>
-    <ul id="me-list"></ul>
-    <button class="me-btn me-main" onclick="editCopy()">📋 一覧をコピー</button>
-    <button class="me-btn" onclick="editClear()">すべて元に戻す</button>
-    <div id="me-msg" class="me-d"></div>
-    <textarea id="me-text" readonly style="display:none"></textarea>`;
-  document.querySelector(".mapbox").after(box);
-  document.getElementById("me-search").onchange = e => {
-    const s = SPOTS.find(x => x.name === e.target.value.trim());
-    if (s){ editSelect(s.id); e.target.value = ""; }
-  };
-  renderMapEdit();
-}
-initMap();
 
 /* ============ 並び替え(おすすめ/あいうえお/近い順) ============ */
 var userPos = null, nearSort = false, sortMode = "kana", kanaRow = ""; /* var: 先行して呼ばれるrender()から参照されるため */
@@ -3007,11 +2788,6 @@ document.querySelectorAll(".sortbtn").forEach(b => {
     navigator.geolocation.getCurrentPosition(p => {
       userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
       b.textContent = "📍 近い順";
-      if (numaMap && typeof maplibregl !== "undefined"){
-        const el = document.createElement("div"); el.className = "map-me"; el.title = "現在地";
-        if (userMarker) userMarker.remove();
-        userMarker = new maplibregl.Marker({ element:el }).setLngLat([userPos.lng, userPos.lat]).addTo(numaMap);
-      }
       setSort("near");
     }, () => {
       b.textContent = "📍 近い順";
