@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="南魚沼市の定番からニッチまで363スポットを検索できる観光アプリ。地図・モデルコース・マイルート・ご当地クイズも。">
+<meta name="description" content="南魚沼市の定番からニッチまで363スポットを検索できる観光アプリ。地図・モデルコース・マイルート・マイルートも。">
 <meta property="og:title" content="ぬまサーチ | 南魚沼おでかけ検索">
-<meta property="og:description" content="定番からニッチまで363スポット。地図・モデルコース・クイズで南魚沼を遊び尽くす。">
+<meta property="og:description" content="定番からニッチまで363スポット。モデルコース・マイルートで南魚沼を遊び尽くす。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zinpika1104.github.io/numa-search/">
 <meta property="og:image" content="https://zinpika1104.github.io/numa-search/ogp.png">
@@ -131,10 +131,6 @@
   .pcard h3 { font-size:.9rem; line-height:1.4; }
   .pcard p { font-size:.74rem; color:var(--muted); margin-top:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 
-  .access { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
-  .acard { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
-  .acard h3 { font-size:1rem; color:var(--indigo); margin-bottom:6px; }
-  .acard p { font-size:.85rem; }
 
   .controls { max-width:960px; margin:0 auto; padding:0; }
   .search-box { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 14px; display:flex; gap:8px; align-items:center; box-shadow:0 2px 10px rgba(20,52,63,.08); }
@@ -230,37 +226,6 @@
   .cleg { font-size:.72rem; color:var(--muted); padding:2px 0 2px 40px; }
 
 
-  /* 四季 */
-  .seasons-title { max-width:1100px; margin:26px auto 0; padding:0 16px; font-size:1.05rem; color:var(--indigo); }
-  .seasons { max-width:1100px; margin:0 auto; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
-  .scard { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
-  .sphoto { height:110px; display:flex; align-items:center; justify-content:center; font-size:2.6rem; color:#fff; }
-  .sphoto img { width:100%; height:100%; object-fit:cover; }
-  .sbody { padding:12px 14px 14px; }
-  .sbody h3 { font-size:.95rem; color:var(--indigo); margin-bottom:6px; }
-  .sbody ul { list-style:none; font-size:.78rem; color:#4a5a63; }
-  .sbody li { padding:2px 0 2px 1.1em; text-indent:-1.1em; }
-  .sbody li::before { content:"・"; color:var(--accent); }
-  .sp-春 { background:linear-gradient(135deg,#f8b5c8,#c9e4a5); }
-  .sp-夏 { background:linear-gradient(135deg,#4a9d6e,#7ec8e3); }
-  .sp-秋 { background:linear-gradient(135deg,#e8734a,#c9973a); }
-  .sp-冬 { background:linear-gradient(135deg,#8fb8d8,#e8eef2); }
-
-  /* クイズ */
-  .quizbar { max-width:1100px; margin:0 auto; padding:0; display:flex; gap:10px; flex-wrap:wrap; }
-  .quizbar .quizbtn { flex:1 1 260px; width:auto; }
-  .quizbtn.hard { background:linear-gradient(135deg,#6e2413,var(--accent)); }
-  .quizbtn { width:100%; border:none; border-radius:14px; padding:14px; font-size:1rem; cursor:pointer;
-             background:linear-gradient(135deg,var(--indigo),#2e6b7e); color:#fff; transition:.15s; }
-  .quizbtn:hover { opacity:.92; }
-  .qz-choice { display:block; width:100%; text-align:left; margin:8px 0; padding:10px 14px; border:1px solid var(--line);
-               border-radius:10px; background:#fff; font-size:.92rem; cursor:pointer; transition:.15s; }
-  .qz-choice:hover { background:#f4f8fa; }
-  .qz-choice.ok { background:#e2efda; border-color:#4a9d6e; }
-  .qz-choice.ng { background:#fde8e4; border-color:#e8734a; }
-  .qz-exp { font-size:.82rem; color:#4a5a63; background:#f4f8fa; border-radius:8px; padding:10px 12px; margin-top:10px; }
-  .qz-next { margin-top:12px; border:none; border-radius:999px; padding:8px 22px; background:var(--accent); color:#fff; cursor:pointer; }
-  .qz-prog { font-size:.75rem; color:var(--muted); margin-bottom:8px; }
   .warnbox { background:#fdf3e4; border:1px solid #e0c48a; border-radius:10px; padding:10px 14px; font-size:.8rem; color:#7a5c1e; margin:12px 0; }
 
   footer.sitefoot { margin-top:48px; background:var(--indigo-dark); color:#cfe3e8; padding:30px 16px 38px; font-size:.75rem; }
@@ -396,10 +361,7 @@ html { scroll-behavior:smooth; }
       <a href="#courses-sec">モデルコース</a>
       <a href="#ranking-sec">ランキング</a>
       <a href="#search">スポット検索</a>
-      <a href="#seasons-sec">四季</a>
-      <a href="#quiz-sec">クイズ</a>
       <a href="#souvenir-sec">お土産</a>
-      <a href="#access">アクセス</a>
     </nav>
   </div>
 </header>
@@ -475,19 +437,6 @@ html { scroll-behavior:smooth; }
   <div class="grid" id="grid"></div>
 </section>
 
-<section class="sec" id="seasons-sec">
-  <div class="sec-head"><span class="en">Seasons</span><h2>南魚沼の四季</h2></div>
-  <div class="seasons" id="seasons"></div>
-</section>
-
-<section class="sec" id="quiz-sec">
-  <div class="sec-head"><span class="en">Quiz</span><h2>ぬまクイズ</h2></div>
-  <div class="quizbar">
-    <button class="quizbtn" id="quizstart">🧠 ぬまクイズに挑戦！ — ご当地クイズ全10問</button>
-    <button class="quizbtn hard" id="quizstart2">🔥 マニア級ぬまクイズ — 難問全10問</button>
-  </div>
-</section>
-
 <section class="sec" id="souvenir-sec">
   <div class="sec-head"><span class="en">Souvenir</span><h2>おすすめお土産</h2></div>
   <div class="omiyage">
@@ -501,15 +450,6 @@ html { scroll-behavior:smooth; }
     <div class="ocard"><h3>🍄 雪国まいたけ・八色しいたけ</h3><p>南魚沼が誇るきのこブランド。肉厚な八色しいたけは焼くだけでご馳走に。</p><div class="oprice">参考: 数百円〜</div><div class="oshop">直売所/市内スーパー</div></div>
   </div>
   <div class="onote">※価格は税込の参考目安です。時期・店舗により変わります。</div>
-</section>
-
-<section class="sec" id="access">
-  <div class="sec-head"><span class="en">Access</span><h2>南魚沼へのアクセス</h2></div>
-  <div class="access">
-    <div class="acard"><h3>🚄 新幹線で</h3><p>東京駅 → 上越新幹線で約1時間30分 → 浦佐駅。六日町方面へはJR上越線に乗り換え約15分。</p></div>
-    <div class="acard"><h3>🚗 車で</h3><p>関越自動車道「六日町IC」「塩沢石打IC」「大和スマートIC」下車。都心から約2時間30分。冬はスタッドレス必須。</p></div>
-    <div class="acard"><h3>🚃 在来線で</h3><p>JR上越線・ほくほく線が市内を縦断。中心駅は六日町駅。越後湯沢駅から約20分。</p></div>
-  </div>
 </section>
 
 <div class="overlay" id="overlay">
@@ -537,10 +477,7 @@ html { scroll-behavior:smooth; }
       <a href="#courses-sec">モデルコース</a>
       <a href="#ranking-sec">ランキング</a>
       <a href="#search">スポット検索</a>
-      <a href="#seasons-sec">四季</a>
-      <a href="#quiz-sec">クイズ</a>
       <a href="#souvenir-sec">お土産</a>
-      <a href="#access">アクセス</a>
     </nav>
     <div class="fnote">営業時間・料金は変わることがあります。お出かけ前に公式情報をご確認ください。<br>
     座標は周辺提案・所要時間の目安計算用の近似値です。データはHTML内のSPOTS配列で編集できます。</div>
@@ -2680,127 +2617,6 @@ document.getElementById("q").addEventListener("input", e => {
   render();
 });
 
-/* ============ 南魚沼の四季(photo:"" に画像URLを入れると写真表示になります) ============ */
-const SEASONS = [
- { name:"春", emoji:"🌸", photo:"", title:"雪解けと花の季節(4〜5月)",
-   items:["坂戸山のカタクリ大群生(4月中旬〜下旬)","銭淵公園の桜と残雪の八海山","六万騎山のカタクリ・イワウチワ","雪解け水で田んぼに水が入る「水鏡」の風景"] },
- { name:"夏", emoji:"🌾", photo:"", title:"緑の盆地とアウトドア(6〜8月)",
-   items:["一面の田園と越後三山の緑","五十沢キャンプ場・裏巻機渓谷の清流","南魚沼市兼続公まつり(6月・大煙火大会)","八海山ロープウェーのサンセット営業"] },
- { name:"秋", emoji:"🍁", photo:"", title:"新米と紅葉と雲海(9〜11月)",
-   items:["新米コシヒカリの収穫(9月下旬〜)","八海山・魚沼スカイラインの紅葉","浦佐・魚沼スカイラインの雲海(晩秋の早朝)","はさ掛け米の原風景"] },
- { name:"冬", emoji:"⛄", photo:"", title:"日本屈指の豪雪と雪国文化(12〜3月)",
-   items:["石打丸山・上越国際など6つ以上のスキー場","雪見露天風呂(六日町温泉ほか)","しおざわ雪譜まつり(2月・雪中行事)","南魚沼市雪まつり"] },
-];
-
-function renderSeasons(){
-  const el = document.getElementById("seasons");
-  if (!el) return;
-  el.innerHTML = SEASONS.map(s => `
-    <div class="scard">
-      <div class="sphoto sp-${s.name}">${s.photo ? `<img src="${s.photo}" alt="${s.name}">` : s.emoji}</div>
-      <div class="sbody">
-        <h3>${s.emoji} ${s.name} — ${esc(s.title)}</h3>
-        <ul>${s.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
-      </div>
-    </div>`).join("");
-}
-
-/* ============ ぬまクイズ(ここを編集して問題を追加できます) ============ */
-const QUIZ = [
- { q:"南魚沼といえばこの米。日本一のブランド米ともいわれる品種は？", c:["ササニシキ","コシヒカリ","あきたこまち"], a:1,
-   exp:"南魚沼産コシヒカリは日本最高峰ブランド。昼夜の寒暖差と雪解け水が旨さの秘密。" },
- { q:"六日町のシンボル・坂戸山の標高は、あの建造物と同じ634m。あの建造物とは？", c:["東京タワー","あべのハルカス","東京スカイツリー"], a:2,
-   exp:"標高634m＝スカイツリーと同じ、が地元の定番小ネタ。山頂には坂戸城跡が残る。" },
- { q:"南魚沼(坂戸城)ゆかりの武将・直江兼続。兜の前立てに掲げた一文字は？", c:["愛","義","忠"], a:0,
-   exp:"「愛」の前立てで有名。六日町には銭淵公園や伝世館などゆかりの地が多い。" },
- { q:"日本酒「八海山」の蔵元・八海醸造が運営する観光施設は？", c:["魚沼の里","雪国の郷","八海の森"], a:0,
-   exp:"魚沼の里には雪室、そば屋、菓子処、ビール醸造所などが集まる。" },
- { q:"名物「へぎそば」のつなぎに使われているものは？", c:["山芋","布海苔(ふのり)","卵"], a:1,
-   exp:"海藻の布海苔をつなぎに使うのが魚沼流。ツルッとした独特のコシが生まれる。" },
- { q:"「へぎそば」の\"へぎ\"とは何のこと？", c:["木の器","そばの品種","茹で方"], a:0,
-   exp:"「剥ぎ板」で作った四角い木の器=へぎに、一口ずつ手繰って盛る。" },
- { q:"江戸時代に雪国の暮らしを全国に伝えたベストセラー「北越雪譜」。著者は塩沢出身の誰？", c:["良寛","鈴木牧之","上杉景勝"], a:1,
-   exp:"鈴木牧之(すずきぼくし)。塩沢の牧之通りや記念館に名を残す。" },
- { q:"塩沢地区に伝わる、国の重要無形文化財の伝統織物は？", c:["塩沢紬","小千谷縮","十日町絣"], a:0,
-   exp:"塩沢紬。塩沢つむぎ記念館では機織り体験もできる。" },
- { q:"雲洞庵の名物フレーズ「雲洞庵の◯◯踏んだか」。◯◯に入るのは？", c:["石","土","雪"], a:1,
-   exp:"「雲洞庵の土踏んだか」。参道の石畳の下に法華経が一字ずつ埋められている。" },
- { q:"南魚沼市が誕生したのは2004年の六日町と大和町の合併。翌2005年に編入した町は？", c:["湯沢町","塩沢町","川口町"], a:1,
-   exp:"2005年に塩沢町が編入し、現在の六日町・塩沢・大和の3エリア体制に。" },
-];
-
-/* マニア級(難問) */
-const QUIZ_HARD = [
- { q:"日本三大奇祭にも数えられる「浦佐毘沙門堂 裸押合大祭」。舞台となる寺は？", c:["龍谷寺","普光寺","雲洞庵"], a:1,
-   exp:"浦佐の普光寺(毘沙門堂)。毎年3月、裸の男衆が押し合う1200年続くとされる奇祭。" },
- { q:"雲洞庵で幼少期に共に学んだと伝わる戦国武将コンビは？", c:["上杉謙信と柿崎景家","上杉景勝と直江兼続","武田信玄と山本勘助"], a:1,
-   exp:"大河ドラマ「天地人」でも描かれた名場面。北高全祝和尚のもとで学んだと伝わる。" },
- { q:"坂戸城主で、上杉景勝の実の父にあたる武将は？", c:["長尾政景","長尾為景","上杉憲政"], a:0,
-   exp:"長尾政景。上杉謙信の姉・仙桃院を妻とし、その子が景勝。坂戸山麓に居館跡が残る。" },
- { q:"霊峰・八海山。八ツ峰よりさらに奥にある\"本当の最高峰\"(1,778m)の名前は？", c:["地蔵岳","大日岳","入道岳"], a:2,
-   exp:"最高峰は入道岳。八ツ峰の大日岳(1,720m)を最高点と思われがち、という通好みの引っかけ。" },
- { q:"日本百名山・巻機山の標高は？", c:["1,867m","1,967m","2,067m"], a:1,
-   exp:"1,967m。織姫伝説の山で、山頂部の池塘と草紅葉が美しい。" },
- { q:"鈴木牧之の「北越雪譜」出版に協力した江戸の文人は？", c:["十返舎一九","山東京山","滝沢馬琴"], a:1,
-   exp:"山東京山(京伝の弟)。出版まで約40年、一九や馬琴への打診を経てようやく世に出た苦労の書。" },
- { q:"「六日町」「五日町」など数字+日の地名。その由来は？", c:["定期市が立つ日","宿場の並び順","開村した日付"], a:0,
-   exp:"六日に市が立った町が六日町。雪国の物流を支えた定期市の名残が地名に生きている。" },
- { q:"六日町温泉が湧き出たきっかけ(昭和32年)は？", c:["温泉ボーリング","天然ガスの試掘","水道工事"], a:1,
-   exp:"天然ガスの試掘中に偶然湧出したのが始まりと伝わる。今では20軒近い宿が並ぶ温泉地に。" },
- { q:"トミオカホワイト美術館の富岡惣一郎が、独自の白色絵具で生涯描き続けた画題は？", c:["雪","雲","白鳥"], a:0,
-   exp:"「白の世界」と呼ばれる雪景色。特製の油絵具「トミオカホワイト」とペインティングナイフで描いた。" },
- { q:"ブランドスイカ「八色(やいろ)スイカ」の産地・八色原があるのはどのエリア？", c:["六日町","塩沢","大和"], a:2,
-   exp:"大和エリア(浦佐周辺)の八色原。水はけのよい扇状地と寒暖差が甘さを生む。夏は直売所が並ぶ。" },
-];
-
-let qzIdx = 0, qzScore = 0, qzSet = QUIZ, qzHard = false;
-function quizStart(hard){
-  if (hard !== undefined) qzHard = hard;
-  qzSet = qzHard ? QUIZ_HARD : QUIZ;
-  qzIdx = 0; qzScore = 0; quizShow();
-}
-function quizShow(){
-  const q = qzSet[qzIdx];
-  $modal.innerHTML = `
-    <button class="close" onclick="closeDetail()">×</button>
-    <div class="qz-prog">${qzHard ? "🔥マニア級　" : ""}第${qzIdx+1}問 / 全${qzSet.length}問　正解数: ${qzScore}</div>
-    <h2>🧠 ${esc(q.q)}</h2>
-    <div style="margin-top:14px">${q.c.map((c,i)=>`<button class="qz-choice" data-i="${i}">${"ABC"[i]}. ${esc(c)}</button>`).join("")}</div>
-    <div id="qzresult"></div>`;
-  $modal.querySelectorAll(".qz-choice").forEach(b => b.onclick = () => quizAnswer(+b.dataset.i));
-  $overlay.classList.add("open");
-}
-function quizAnswer(i){
-  const q = qzSet[qzIdx];
-  $modal.querySelectorAll(".qz-choice").forEach((b,bi) => {
-    b.onclick = null;
-    if (bi === q.a) b.classList.add("ok");
-    else if (bi === i) b.classList.add("ng");
-  });
-  const ok = i === q.a;
-  if (ok) qzScore++;
-  document.getElementById("qzresult").innerHTML = `
-    <div class="qz-exp"><b>${ok ? "⭕ 正解！" : "❌ 残念…正解は「" + esc(q.c[q.a]) + "」"}</b><br>${esc(q.exp)}</div>
-    <button class="qz-next" id="qznext">${qzIdx < qzSet.length-1 ? "次の問題へ →" : "結果を見る"}</button>`;
-  document.getElementById("qznext").onclick = () => { qzIdx++; qzIdx < qzSet.length ? quizShow() : quizResult(); };
-}
-function quizResult(){
-  const r = qzHard && qzScore >= 9 ? "👑 真のぬま博士！マニア級制覇、地元民超えです" :
-            qzScore >= 9 ? "🏆 ぬま博士！地元民レベルです" :
-            qzScore >= 7 ? "🎉 ぬま通！かなり詳しい" :
-            qzScore >= 4 ? "🙂 ぬま入門者。旅すればもっと詳しくなる" :
-                           "🌱 これから！アプリで予習して出かけよう";
-  $modal.innerHTML = `
-    <button class="close" onclick="closeDetail()">×</button>
-    <h2>${qzHard ? "🔥 マニア級" : "🧠"} クイズ結果</h2>
-    <p style="font-size:2rem;margin:14px 0">${qzScore} / ${qzSet.length} 問正解</p>
-    <p style="font-size:1.05rem">${r}</p>
-    <button class="qz-next" onclick="quizStart()" style="margin-right:8px">もう一度挑戦</button>
-    <button class="qz-next" onclick="closeDetail()" style="background:var(--indigo)">閉じる</button>`;
-}
-document.getElementById("quizstart").onclick = () => quizStart(false);
-document.getElementById("quizstart2").onclick = () => quizStart(true);
-renderSeasons();
 
 render();
 renderCourses();
