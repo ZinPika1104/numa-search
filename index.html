@@ -75,8 +75,9 @@
   .ph-by { position:absolute; right:8px; bottom:8px; font-size:.62rem; color:#fff; background:rgba(0,0,0,.5); padding:2px 8px; border-radius:10px; }
   .pcard .pthumb { position:relative; overflow:hidden; }
   .pphoto { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .ophoto { display:block; width:calc(100% + 32px); margin:-16px -16px 12px; height:130px; object-fit:cover; border-radius:inherit; border-bottom-left-radius:0; border-bottom-right-radius:0; }
   .omiyage { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
-  .ocard { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 16px 14px; }
+  .ocard { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 16px 14px; overflow:hidden; }
   .ocard h3 { font-size:.95rem; margin:2px 0 5px; }
   .ocard p { font-size:.78rem; color:#555; line-height:1.6; margin:0; }
   .ocard .oprice { margin-top:9px; font-size:.84rem; font-weight:bold; color:var(--accent); }
@@ -217,6 +218,12 @@
   /* モデルコース */
   .courses-title { max-width:960px; margin:20px auto 0; padding:0 16px; font-size:1rem; color:var(--indigo-dark); }
   .courses { max-width:1100px; margin:0 auto; padding:0 0 6px; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+  .ucwrap { text-align:center; margin-top:14px; } .ucnote { font-size:.74rem; color:var(--muted); margin-top:6px; }
+  .ucform { display:flex; flex-direction:column; gap:8px; } .ucform input, .ucform textarea { border:1px solid var(--line); border-radius:10px; padding:9px 12px; font-size:.92rem; font-family:inherit; width:100%; }
+  .ucform textarea { min-height:64px; resize:vertical; } .ucres button { display:block; width:100%; text-align:left; background:#f4f8f9; border:1px solid var(--line); border-radius:8px; padding:7px 10px; margin-top:4px; font-size:.84rem; cursor:pointer; font-family:inherit; }
+  .ucsel .ucrow { display:flex; align-items:center; gap:6px; background:#e6f3f5; border-radius:8px; padding:6px 10px; margin-top:4px; font-size:.86rem; } .ucsel .ucrow span { flex:1; } .ucsel .ucrow button { border:none; background:none; cursor:pointer; font-size:.9rem; }
+  .cmore { grid-column:1/-1; justify-self:center; background:#fff; border:1px solid var(--indigo); color:var(--indigo); border-radius:999px; padding:8px 20px; font-size:.85rem; font-weight:700; cursor:pointer; font-family:inherit; }
+  .cmore:hover { background:#e6f3f5; }
   .ccard { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; cursor:pointer; transition:.15s; }
   .ccard:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(20,52,63,.12); }
   .ccard h3 { font-size:.95rem; margin-bottom:4px; }
@@ -418,6 +425,7 @@ html { scroll-behavior:smooth; }
   <div class="sec-head"><span class="en">Model Course</span><h2>おすすめモデルコース</h2></div>
   <div class="ctypes" id="ctypes"></div>
   <div class="courses" id="courses"></div>
+  <div class="ucwrap" id="ucwrap" style="display:none"><button class="cmore" id="ucopen" style="grid-column:auto">✏️ あなたのおすすめコースを投稿する</button><div class="ucnote">投稿は管理者が確認してから「みんなのコース」に公開されます。</div></div>
 </section>
 
 <section class="sec" id="pickup-sec">
@@ -2565,22 +2573,27 @@ function renderRoute(){
 /* ---- モデルコース ---- */
 function courseSpots(c){ return c.spots.map(id => SPOTS.find(s => s.id === id)).filter(Boolean); }
 
-let courseType = "";
+let courseType = "", courseAll = false;
+const COURSE_FIRST = 3;
 function renderCourses(){
   const types = []; COURSES.forEach(c => (c.types || []).forEach(t => { if (!types.includes(t)) types.push(t); }));
   const tb = document.getElementById("ctypes");
   tb.innerHTML = [""].concat(types).map(t =>
     `<button class="chip${t === courseType ? " active" : ""}" data-t="${esc(t)}">${t ? esc(t) : "すべて"}<span class="chip-n">${t ? COURSES.filter(c => (c.types||[]).includes(t)).length : COURSES.length}</span></button>`).join("");
-  tb.querySelectorAll(".chip").forEach(b => b.onclick = () => { courseType = b.dataset.t; renderCourses(); });
-  document.getElementById("courses").innerHTML = COURSES.filter(c => !courseType || (c.types || []).includes(courseType)).map(c => `
+  tb.querySelectorAll(".chip").forEach(b => b.onclick = () => { courseType = b.dataset.t; courseAll = false; renderCourses(); });
+  const cl = COURSES.filter(c => !courseType || (c.types || []).includes(courseType));
+  const cshow = courseAll ? cl : cl.slice(0, COURSE_FIRST);
+  document.getElementById("courses").innerHTML = cshow.map(c => `
     <div class="ccard" data-cid="${c.id}">
       <h3>${esc(c.title)}</h3>
       <div>${(c.types || []).map(t => `<span class="ctag">${esc(t)}</span>`).join("")}</div>
       <p>${esc(c.catch)}</p>
-      <div class="cmeta">${courseSpots(c).length}スポット ・ ${esc(c.duration)} ・ ${esc(c.season)}</div>
+      <div class="cmeta">${[courseSpots(c).length + "スポット", c.duration, c.season].filter(Boolean).map(esc).join(" ・ ")}</div>
       <a class="cmap" href="${routeGmapsUrl(courseSpots(c))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺 Googleマップでルートを見る ↗</a>
-    </div>`).join("");
+    </div>`).join("") + (cl.length > COURSE_FIRST ? `<button class="cmore" id="cmore">${courseAll ? "▲ 閉じる" : "▼ ほかのコースも見る(あと" + (cl.length - COURSE_FIRST) + "本)"}</button>` : "");
   document.querySelectorAll(".ccard").forEach(el => el.onclick = () => openCourse(el.dataset.cid));
+  const cm = document.getElementById("cmore");
+  if (cm) cm.onclick = () => { courseAll = !courseAll; renderCourses(); };
 }
 
 function openCourse(cid){
@@ -2608,11 +2621,11 @@ function openCourse(cid){
   $modal.innerHTML = `
     <button class="close" id="mclose">✕</button>
     <h2>🗺 ${esc(c.title)}</h2>
-    <p class="sub">${esc(c.duration)} ・ ベストシーズン: ${esc(c.season)} ・ 移動合計 約${total.toFixed(1)}km / 車で約${driveMin(total)}分(目安)</p>
+    <p class="sub">${[c.duration, c.season ? "ベストシーズン: " + c.season : ""].filter(Boolean).map(esc).join(" ・ ")}${c.duration || c.season ? " ・ " : ""}移動合計 約${total.toFixed(1)}km / 車で約${driveMin(total)}分(目安)</p>
     <p class="desc">${esc(c.catch)}</p>
     <a class="btn-bigmap" href="${routeGmapsUrl(sp)}" target="_blank" rel="noopener">🚗 Googleマップでこのコースのルートを開く</a>
     <div class="cmap-sub">出発地はGoogleマップ側で「現在地」になります。<a href="${routeGmapsUrl(sp, true)}" target="_blank" rel="noopener">最初のスポットを出発地にして開く</a></div>
-    <div class="niche"><b>💡 コースのコツ</b>${esc(c.tip)}</div>
+    ${c.tip ? `<div class="niche"><b>💡 コースのコツ</b>${esc(c.tip)}</div>` : ""}
     <div class="nearby">${rows}</div>
     <div class="btns" style="margin-top:16px">
       <button class="btn btn-add" id="csetroute">➕ マイルートにセット</button>
@@ -2655,6 +2668,83 @@ document.getElementById("q").addEventListener("input", e => {
 render();
 renderCourses();
 renderRoute();
+
+/* ============ みんなのコース投稿(Firestore: usercourses / 管理者が approved=true にすると公開) ============ */
+const UC_TYPE = "みんなのコース";
+let ucSel = [];
+function loadUserCourses(){
+  if (!FB_PROJECT_ID) return;
+  const w = document.getElementById("ucwrap");
+  if (w){ w.style.display = ""; document.getElementById("ucopen").onclick = openCourseForm; }
+  fetch(fbBase() + ":runQuery?key=" + FB_API_KEY, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: "usercourses" }],
+      where: { fieldFilter: { field: { fieldPath: "approved" }, op: "EQUAL", value: { booleanValue: true } } }, limit: 50 } })
+  }).then(r => r.json()).then(rows => {
+    const list = (Array.isArray(rows) ? rows : []).filter(r => r.document).map(r => {
+      const f = r.document.fields || {}, s = k => (f[k] && f[k].stringValue) || "";
+      const spots = s("spots").split(",").filter(id => SPOTS.some(x => x.id === id)).slice(0, 10);
+      return { id: "u_" + r.document.name.split("/").pop(), title: s("title"), catch: s("catch"), tip: s("tip"), spots,
+               types: [UC_TYPE], duration: "投稿: " + (s("name") || "名無しのぬま人"), season: "",
+               ts: Number((f.ts && (f.ts.integerValue || f.ts.doubleValue)) || 0) };
+    }).filter(c => c.title && c.spots.length >= 2).sort((a, b) => b.ts - a.ts);
+    if (list.length){ list.forEach(c => COURSES.push(c)); renderCourses(); }
+  }).catch(() => {});
+}
+function ucRenderSel(){
+  const box = document.getElementById("ucsel"); if (!box) return;
+  box.innerHTML = ucSel.map((id, i) => { const s = SPOTS.find(x => x.id === id);
+    return `<div class="ucrow"><b>${i+1}.</b><span>${esc(s ? s.name : id)}</span>${i ? `<button data-up="${i}" title="上へ">↑</button>` : ""}<button data-rm="${i}" title="削除">✕</button></div>`; }).join("");
+  box.querySelectorAll("[data-up]").forEach(b => b.onclick = () => { const i = +b.dataset.up; [ucSel[i-1], ucSel[i]] = [ucSel[i], ucSel[i-1]]; ucRenderSel(); });
+  box.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { ucSel.splice(+b.dataset.rm, 1); ucRenderSel(); });
+}
+function openCourseForm(){
+  ucSel = [];
+  $modal.innerHTML = `<button class="close" id="mclose">✕</button><h2>✏️ モデルコースを投稿</h2>
+    <p class="sub">投稿すると管理者が確認し、OKが出たら「みんなのコース」に公開されます。</p>
+    <div class="ucform">
+      <input id="uctitle" maxlength="30" placeholder="コース名(例: 雪国で食べ歩き半日)">
+      <input id="uccatch" maxlength="60" placeholder="ひとこと紹介">
+      <input id="ucname" maxlength="12" placeholder="ニックネーム(任意)">
+      <textarea id="uctip" maxlength="150" placeholder="コースのコツ・おすすめポイント(任意)"></textarea>
+      <input id="ucq" placeholder="🔍 スポット名で検索して追加(2〜10か所・回る順)">
+      <div class="ucres" id="ucres"></div><div class="ucsel" id="ucsel"></div>
+      <div class="btns"><button class="btn btn-add" id="ucsend">📮 投稿する</button></div>
+      <span class="bkmsg" id="ucmsg"></span>
+    </div>`;
+  $overlay.classList.add("open");
+  document.getElementById("mclose").onclick = closeDetail;
+  document.getElementById("ucq").oninput = e => {
+    const k = e.target.value.trim().toLowerCase(), res = document.getElementById("ucres");
+    const hits = k ? SPOTS.filter(s => !ucSel.includes(s.id) && (s.name.toLowerCase().includes(k) || (s.tags||[]).some(x => x.toLowerCase().includes(k)))).slice(0, 8) : [];
+    res.innerHTML = hits.map(s => `<button type="button" data-id="${s.id}">＋ ${esc(s.name)}<small>(${esc(s.genre)}・${esc(s.area)})</small></button>`).join("");
+    res.querySelectorAll("button").forEach(b => b.onclick = () => {
+      if (ucSel.length >= 10){ document.getElementById("ucmsg").textContent = "スポットは10か所までです"; return; }
+      ucSel.push(b.dataset.id); ucRenderSel(); e.target.value = ""; res.innerHTML = "";
+    });
+  };
+  document.getElementById("ucsend").onclick = postUserCourse;
+}
+function postUserCourse(){
+  const msg = document.getElementById("ucmsg"), v = id => (document.getElementById(id).value || "").trim();
+  const title = v("uctitle");
+  if (!title){ msg.textContent = "コース名を入れてね"; return; }
+  if (ucSel.length < 2){ msg.textContent = "スポットを2か所以上選んでね"; return; }
+  let last = 0; try { last = Number(localStorage.getItem("numaCoursePosted") || 0); } catch(e){}
+  if (Date.now() - last < 60000){ msg.textContent = "続けて投稿するときは少し時間をあけてね"; return; }
+  msg.textContent = "送信中…";
+  const sv = x => ({ stringValue: x });
+  fetch(fbBase() + "/usercourses?key=" + FB_API_KEY, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: { title: sv(title.slice(0, 30)), catch: sv(v("uccatch").slice(0, 60)), tip: sv(v("uctip").slice(0, 150)),
+      name: sv(v("ucname").slice(0, 12)), spots: sv(ucSel.join(",")), ts: { integerValue: String(Date.now()) }, approved: { booleanValue: false } } })
+  }).then(r => { if (!r.ok) throw 0;
+    try { localStorage.setItem("numaCoursePosted", String(Date.now())); } catch(e){}
+    document.querySelector(".ucform").innerHTML = `<p class="desc">📮 投稿ありがとう！管理者が確認して、OKなら「みんなのコース」に載ります。</p><div class="btns"><button class="btn btn-add" onclick="closeDetail()">閉じる</button></div>`;
+  }).catch(() => { msg.textContent = "投稿に失敗しました。時間をおいて試してね。"; });
+}
+loadUserCourses();
+
 
 
 /* ============ 並び替え(おすすめ/あいうえお/近い順) ============ */
@@ -2783,6 +2873,36 @@ function heroPrev(){ if (heroCount > 1){ heroGo((heroCur-1+heroCount) % heroCoun
 })();
 
 /* Pick up! カード */
+/* Wikimedia Commons の写真(Special:FilePath経由。読み込み失敗時は絵文字表示のまま) */
+const WIKI_IMG = {
+ "AOKISHUZO The Sake Brewery, Minamiuonuma, Niigata, Japan, April 2023.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/AOKISHUZO_The_Sake_Brewery%2C_Minamiuonuma%2C_Niigata%2C_Japan%2C_April_2023.jpg/500px-AOKISHUZO_The_Sake_Brewery%2C_Minamiuonuma%2C_Niigata%2C_Japan%2C_April_2023.jpg",
+ "Amazake.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Amazake.jpg/500px-Amazake.jpg",
+ "Baumkuchen.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Baumkuchen.jpg/500px-Baumkuchen.jpg",
+ "Koshihikari.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Koshihikari.jpg/500px-Koshihikari.jpg",
+ "Lentinula edodes.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Lentinula_edodes.jpg/500px-Lentinula_edodes.jpg",
+ "Michinoeki MinamiUonuma.JPG": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Michinoeki_MinamiUonuma.JPG/500px-Michinoeki_MinamiUonuma.JPG",
+ "Sake Hakkaisan.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Sake_Hakkaisan.jpg/500px-Sake_Hakkaisan.jpg",
+ "Sasadango1.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Sasadango1.jpg/500px-Sasadango1.jpg",
+ "関興寺 (Kankouji-Temple) - panoramio.jpg": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/%E9%96%A2%E8%88%88%E5%AF%BA_%28Kankouji-Temple%29_-_panoramio.jpg/500px-%E9%96%A2%E8%88%88%E5%AF%BA_%28Kankouji-Temple%29_-_panoramio.jpg"
+};
+function wikiImg(file){ return WIKI_IMG[file] || null; }
+const PICKUP_PHOTO = {
+  yukiakari: "Michinoeki MinamiUonuma.JPG",
+  shikiajiwaikan: "Michinoeki MinamiUonuma.JPG",
+  kankouji: "関興寺 (Kankouji-Temple) - panoramio.jpg"
+};
+/* おすすめお土産の写真(カードの並び順。nullは写真なし)。※一部は商品そのものではなくイメージ写真 */
+const OMIYAGE_PHOTO = ["Koshihikari.jpg", "Amazake.jpg", "AOKISHUZO The Sake Brewery, Minamiuonuma, Niigata, Japan, April 2023.jpg", "Sake Hakkaisan.jpg", "Sasadango1.jpg", "Baumkuchen.jpg", null, "Lentinula edodes.jpg"];
+(function(){
+  document.querySelectorAll(".omiyage .ocard").forEach((el,i) => {
+    const f = OMIYAGE_PHOTO[i];
+    if (!f) return;
+    const im = document.createElement("img");
+    im.className = "ophoto"; im.alt = ""; im.loading = "lazy"; im.src = wikiImg(f);
+    im.onerror = () => im.remove();
+    el.insertBefore(im, el.firstChild);
+  });
+})();
 const PICKUP_IDS = ["tabataya","yukiakari","satoya","sucre","sanaburi","keyakien","shikiajiwaikan","kankouji"];
 (function(){
   const $p = document.getElementById("pickup");
@@ -2791,7 +2911,8 @@ const PICKUP_IDS = ["tabataya","yukiakari","satoya","sucre","sanaburi","keyakien
   PICKUP_IDS.map(id => SPOTS.find(s => s.id === id)).filter(Boolean).forEach(s => {
     const d = document.createElement("div");
     d.className = "pcard";
-    d.innerHTML = `<div class="pthumb g-${s.genre}">${spotPhoto(s.id) ? `<img class="pphoto" src="${spotPhoto(s.id)}" alt="" loading="lazy" onerror="this.remove()">` : ""}${EMOJI[s.genre]||"📍"}</div><div class="pbody"><h3>${esc(s.name)}</h3><p>${esc(s.desc||"")}</p></div>`;
+    const pu = spotPhoto(s.id) || (PICKUP_PHOTO[s.id] ? wikiImg(PICKUP_PHOTO[s.id]) : null);
+    d.innerHTML = `<div class="pthumb g-${s.genre}">${pu ? `<img class="pphoto" src="${pu}" alt="" loading="lazy" onerror="this.remove()">` : ""}${EMOJI[s.genre]||"📍"}</div><div class="pbody"><h3>${esc(s.name)}</h3><p>${esc(s.desc||"")}</p></div>`;
     d.onclick = () => openDetail(s.id);
     $p.appendChild(d);
   });
