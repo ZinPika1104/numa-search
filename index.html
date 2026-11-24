@@ -361,7 +361,7 @@ html { scroll-behavior:smooth; }
 </style>
 </head>
 <body>
-<div id="seasonbg" aria-hidden="true"><div class="sb"></div><div class="sb"></div><div class="sb"></div><div class="sb"></div></div>
+<div id="seasonbg" aria-hidden="true"><div class="sb"></div><div class="sb"></div><div class="sb"></div><div class="sb"></div><div class="sb"></div></div>
 <div id="seasonlabel" aria-hidden="true"><span class="sl-on">🌱 春</span></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="numa-art" viewBox="0 0 260 150">
@@ -2752,7 +2752,8 @@ loadUserCourses();
 
 /* ============ 四季の背景(スクロールで 春→夏→秋→冬) ============ */
 const SEASON_BG = [
-  { label:"🌱 春(新緑)", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mt.Hakkai_01.jpg/1280px-Mt.Hakkai_01.jpg" },
+  { label:"🌸 春(桜)", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/UonumaPhoto_Uono_River_Sakura_Koide_201804.jpg/1280px-UonumaPhoto_Uono_River_Sakura_Koide_201804.jpg" },
+  { label:"🌱 新緑", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mt.Hakkai_01.jpg/1280px-Mt.Hakkai_01.jpg" },
   { label:"☀️ 夏", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Koguriyama_snow-shelter.jpg/1280px-Koguriyama_snow-shelter.jpg" },
   { label:"🍁 秋", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Mt._Hakkai_autumn_panorama_%2852455681561%29.jpg/1280px-Mt._Hakkai_autumn_panorama_%2852455681561%29.jpg" },
   { label:"⛄ 冬", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Find47_Niigata-Spring_in_the_snowy_country_%28Uonuma_City%29-m.jpg/1280px-Find47_Niigata-Spring_in_the_snowy_country_%28Uonuma_City%29-m.jpg" }
@@ -2766,7 +2767,8 @@ const SEASON_BG = [
     tick = false;
     const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
     const pos = Math.min(1, Math.max(0, window.scrollY / max)) * (SEASON_BG.length - 1);
-    layers.forEach((el,i) => { el.style.opacity = Math.max(0, 1 - Math.abs(pos - i)); });
+    /* 下の写真は常に不透明のまま、次の写真を上に重ねて徐々に濃くする(間に白が透けない) */
+    layers.forEach((el,i) => { el.style.opacity = i <= Math.floor(pos) ? 1 : (i === Math.floor(pos) + 1 ? pos - Math.floor(pos) : 0); });
     const n = Math.round(pos);
     if (n !== cur){ cur = n; if (lab) lab.innerHTML = '<span class="sl-on">' + SEASON_BG[n].label + '</span>'; }
   }
