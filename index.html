@@ -126,9 +126,10 @@
   @media (max-width:600px){ .concept { margin-top:40px; } .concept-body { line-height:2.2; letter-spacing:.06em; } }
 
   /* 南魚沼の四季(スクロールで 春→夏→秋→冬 と背景写真が移り変わる) */
-  #seasonbg { position:fixed; inset:0; z-index:-1; pointer-events:none; background:var(--snow); }
-  #seasonbg .sb { position:absolute; inset:0; background:center/cover no-repeat; opacity:0; will-change:opacity; }
-  #seasonbg::after { content:""; position:absolute; inset:0; background:linear-gradient(rgba(250,251,252,.4),rgba(250,251,252,.55)); }
+  #seasonbg { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; overflow:hidden; background:var(--snow); }
+  #seasonbg .sb { position:absolute; left:0; width:100%; background:center/cover no-repeat; }
+  #seasonbg .sb + .sb { -webkit-mask-image:linear-gradient(transparent,#000 var(--f,300px)); mask-image:linear-gradient(transparent,#000 var(--f,300px)); }
+  #seasonbg::after { content:""; position:absolute; inset:0; background:linear-gradient(rgba(250,251,252,.5),rgba(250,251,252,.6)); }
   #seasonlabel { position:fixed; left:12px; bottom:12px; z-index:30; background:rgba(255,255,255,.88); border:1px solid var(--line); border-radius:999px; padding:4px 12px; font-size:.78rem; font-weight:700; color:var(--indigo); box-shadow:0 2px 8px rgba(20,52,63,.12); pointer-events:none; transition:opacity .3s; }
   .sec { max-width:1100px; margin:38px auto 0; padding:0 16px; }
   .sec-head { text-align:center; margin-bottom:18px; }
@@ -2761,20 +2762,28 @@ const SEASON_BG = [
 (function(){
   const layers = document.querySelectorAll("#seasonbg .sb"), lab = document.getElementById("seasonlabel");
   if (!layers.length) return;
-  layers.forEach((el,i) => { const img = new Image(); img.onload = () => { el.style.backgroundImage = 'url("' + SEASON_BG[i].url + '")'; update(); }; img.src = SEASON_BG[i].url; });
+  layers.forEach((el,i) => { const img = new Image(); img.onload = () => { el.style.backgroundImage = 'url("' + SEASON_BG[i].url + '")'; }; img.src = SEASON_BG[i].url; });
+  const bg = document.getElementById("seasonbg");
   let cur = -1, tick = false;
+  /* 背景はページ全体に縦に並べる(固定しない)。上から 春→新緑→夏→秋→冬 と写真が移り変わる */
+  function layout(){
+    const H = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight), n = layers.length, band = H / n, F = Math.min(320, band * .45);
+    bg.style.height = H + "px";
+    layers.forEach((el,i) => {
+      const top = i ? i * band - F : 0, bottom = (i + 1) * band;
+      el.style.top = top + "px"; el.style.height = (bottom - top) + "px"; el.style.setProperty("--f", (i ? F : 0) + "px");
+    });
+  }
   function update(){
     tick = false;
-    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    const pos = Math.min(1, Math.max(0, window.scrollY / max)) * (SEASON_BG.length - 1);
-    /* 下の写真は常に不透明のまま、次の写真を上に重ねて徐々に濃くする(間に白が透けない) */
-    layers.forEach((el,i) => { el.style.opacity = i <= Math.floor(pos) ? 1 : (i === Math.floor(pos) + 1 ? pos - Math.floor(pos) : 0); });
-    const n = Math.round(pos);
-    if (n !== cur){ cur = n; if (lab) lab.innerHTML = '<span class="sl-on">' + SEASON_BG[n].label + '</span>'; }
+    const mid = window.scrollY + window.innerHeight / 2, H = Math.max(1, document.documentElement.scrollHeight);
+    const nn = Math.min(SEASON_BG.length - 1, Math.max(0, Math.floor(mid / H * SEASON_BG.length)));
+    if (nn !== cur){ cur = nn; if (lab) lab.innerHTML = '<span class="sl-on">' + SEASON_BG[nn].label + '</span>'; }
   }
   window.addEventListener("scroll", () => { if (!tick){ tick = true; requestAnimationFrame(update); } }, { passive:true });
-  window.addEventListener("resize", update);
-  update();
+  window.addEventListener("resize", () => { layout(); update(); });
+  if (window.ResizeObserver) new ResizeObserver(() => { layout(); update(); }).observe(document.body);
+  layout(); update();
 })();
 
 
