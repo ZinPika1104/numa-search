@@ -125,6 +125,11 @@
   .concept-body p + p { margin-top:.2em; }
   @media (max-width:600px){ .concept { margin-top:40px; } .concept-body { line-height:2.2; letter-spacing:.06em; } }
 
+  /* 南魚沼の四季(スクロールで 春→夏→秋→冬 と背景写真が移り変わる) */
+  #seasonbg { position:fixed; inset:0; z-index:-1; pointer-events:none; background:var(--snow); }
+  #seasonbg .sb { position:absolute; inset:0; background:center/cover no-repeat; opacity:0; will-change:opacity; }
+  #seasonbg::after { content:""; position:absolute; inset:0; background:linear-gradient(rgba(250,251,252,.4),rgba(250,251,252,.55)); }
+  #seasonlabel { position:fixed; left:12px; bottom:12px; z-index:30; background:rgba(255,255,255,.88); border:1px solid var(--line); border-radius:999px; padding:4px 12px; font-size:.78rem; font-weight:700; color:var(--indigo); box-shadow:0 2px 8px rgba(20,52,63,.12); pointer-events:none; transition:opacity .3s; }
   .sec { max-width:1100px; margin:38px auto 0; padding:0 16px; }
   .sec-head { text-align:center; margin-bottom:18px; }
   .sec-head .en { display:block; font-family:Georgia,"Times New Roman",serif; font-style:italic; color:var(--accent); font-size:1rem; letter-spacing:.08em; }
@@ -356,6 +361,8 @@ html { scroll-behavior:smooth; }
 </style>
 </head>
 <body>
+<div id="seasonbg" aria-hidden="true"><div class="sb"></div><div class="sb"></div><div class="sb"></div><div class="sb"></div></div>
+<div id="seasonlabel" aria-hidden="true"><span class="sl-on">🌱 春</span></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="numa-art" viewBox="0 0 260 150">
     <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -378,7 +385,7 @@ html { scroll-behavior:smooth; }
     <div class="vtitle"><span>南魚沼市の</span><span>旅がひろがる</span><span>ぬまサーチ</span></div>
     <svg class="sp-art" viewBox="0 0 260 150"><use href="#numa-art"/></svg>
   </div>
-  <span class="sp-credit">📷 坂戸山 / Wikimedia Commons</span>
+  <span class="sp-credit">📷 雲洞庵 / Wikimedia Commons</span>
 </div>
 <script>try{ if (sessionStorage.getItem("numaSplash") || location.hash) document.getElementById("splash").remove(); }catch(e){}</script>
 
@@ -512,6 +519,7 @@ html { scroll-behavior:smooth; }
   <div class="sitefoot-inner">
     <div class="flogo">ぬまサーチ</div>
     <div>新潟県南魚沼市の観光スポット検索アプリ — 定番からニッチまで363スポット</div>
+    <div style="opacity:.7;margin-top:6px">背景の四季の写真・各種写真: Wikimedia Commons(八海山・巻機山・魚沼エリアの風景)</div>
     <nav class="fnav">
       <a href="#courses-sec">モデルコース</a>
       <a href="#ranking-sec">ランキング</a>
@@ -2741,6 +2749,31 @@ function postUserCourse(){
   }).catch(() => { msg.textContent = "投稿に失敗しました。時間をおいて試してね。"; });
 }
 loadUserCourses();
+
+/* ============ 四季の背景(スクロールで 春→夏→秋→冬) ============ */
+const SEASON_BG = [
+  { label:"🌱 春(新緑)", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mt.Hakkai_01.jpg/1280px-Mt.Hakkai_01.jpg" },
+  { label:"☀️ 夏", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Koguriyama_snow-shelter.jpg/1280px-Koguriyama_snow-shelter.jpg" },
+  { label:"🍁 秋", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Mt._Hakkai_autumn_panorama_%2852455681561%29.jpg/1280px-Mt._Hakkai_autumn_panorama_%2852455681561%29.jpg" },
+  { label:"⛄ 冬", url:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Find47_Niigata-Spring_in_the_snowy_country_%28Uonuma_City%29-m.jpg/1280px-Find47_Niigata-Spring_in_the_snowy_country_%28Uonuma_City%29-m.jpg" }
+];
+(function(){
+  const layers = document.querySelectorAll("#seasonbg .sb"), lab = document.getElementById("seasonlabel");
+  if (!layers.length) return;
+  layers.forEach((el,i) => { const img = new Image(); img.onload = () => { el.style.backgroundImage = 'url("' + SEASON_BG[i].url + '")'; update(); }; img.src = SEASON_BG[i].url; });
+  let cur = -1, tick = false;
+  function update(){
+    tick = false;
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const pos = Math.min(1, Math.max(0, window.scrollY / max)) * (SEASON_BG.length - 1);
+    layers.forEach((el,i) => { el.style.opacity = Math.max(0, 1 - Math.abs(pos - i)); });
+    const n = Math.round(pos);
+    if (n !== cur){ cur = n; if (lab) lab.innerHTML = '<span class="sl-on">' + SEASON_BG[n].label + '</span>'; }
+  }
+  window.addEventListener("scroll", () => { if (!tick){ tick = true; requestAnimationFrame(update); } }, { passive:true });
+  window.addEventListener("resize", update);
+  update();
+})();
 
 
 
